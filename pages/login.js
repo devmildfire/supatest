@@ -40,7 +40,12 @@ export default function LoginPage() {
       <h1> Login </h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="email"> Email </label>
-        <input type="email" if="email" name="email" />
+        <input
+          type="email"
+          id="email"
+          name="email"
+          defaultValue="mildfirey@yandex.ru"
+        />
         <button type="submit"> Log In </button>
       </form>
       <div>
