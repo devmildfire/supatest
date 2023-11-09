@@ -2,57 +2,15 @@ import supabase from "@/utils/supabase";
 import styles from "../../styles/Home.module.css";
 import { useState, useEffect } from "react";
 
-// export async function getServerSideProps({ params }) {
-//   const { data: products, error } = await supabase
-//     .from("Products")
-//     .select(
-//       `
-//       id,
-//       name,
-//       category,
-//       Audiobooks ( * ),
-//       Ebooks ( * ),
-//       PrintedBooks ( *,
-//         options:PrintOptions ( *,
-//           size:PrintSize( * )
-//         ),
-//         cover:PrintedCover( * )
-//       ),
-//       Awards ( * )
-//       `
-//     )
-//     .eq("name", params.title);
+export async function getServerSideProps({ params }) {
+  return {
+    props: {
+      params,
+    },
+  };
+}
 
-//   if (error) {
-//     throw new Error(error);
-//   }
-
-//   // console.log(await sessionData);
-
-//   return {
-//     props: {
-//       products,
-//     },
-//   };
-// }
-
-// export async function getServerSideProps() {
-//   const { data, error } = await supabase.auth.getSession();
-
-//   if (error) {
-//     throw new Error(error);
-//   }
-
-//   console.log(JSON.stringify(data, null, 2));
-
-//   return {
-//     props: {
-//       data,
-//     },
-//   };
-// }
-
-export default function ProductPage() {
+export default function ProductPage({ params }) {
   const [session, setSession] = useState(null);
   const [products, setProducts] = useState(null);
   const [user, setUser] = useState(null);
@@ -91,7 +49,8 @@ export default function ProductPage() {
         Awards ( * )
         `
         )
-        .eq("name", "Awesome Title");
+        .eq("name", params.title);
+      // .eq("name", "Awesome Title");
 
       if (error) {
         console.error(error);

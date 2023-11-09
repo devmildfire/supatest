@@ -26,7 +26,7 @@ function Login() {
   return (
     <div className={styles.container}>
       <h1> Login </h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <label htmlFor="email"> Email </label>
         <input
           type="email"
@@ -41,7 +41,9 @@ function Login() {
           name="password"
           defaultValue="0892387639"
         />
-        <button type="submit"> Log In </button>
+        <button type="submit" className={styles.button}>
+          Log In
+        </button>
       </form>
       {/* <pre> {JSON.stringify(session, null, 2)} </pre> */}
     </div>
@@ -71,7 +73,7 @@ function SignUp() {
   return (
     <div className={styles.container}>
       <h1> Sign Up </h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <label htmlFor="email"> Email </label>
         <input
           type="email"
@@ -81,7 +83,9 @@ function SignUp() {
         />
         <label htmlFor="password"> Password </label>
         <input type="password" id="password" name="password" defaultValue="" />
-        <button type="submit"> Sign Up </button>
+        <button type="submit" className={styles.button}>
+          Sign Up
+        </button>
       </form>
       {/* <pre> {JSON.stringify(session, null, 2)} </pre> */}
     </div>
@@ -110,7 +114,9 @@ function SessionInfo({ session }) {
       currently logged in as {session.user.email}
       {/* <h1> Log Out </h1> */}
       <form onSubmit={handleSubmit}>
-        <button type="submit"> Log Out </button>
+        <button type="submit" className={styles.button}>
+          Log Out
+        </button>
       </form>
     </div>
   );
@@ -156,16 +162,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-// <div className={styles.container}>
-//   <div>
-//     {session ? (
-//       <div>
-//         <p>you are logged in as {session.data.session.user.email}</p>
-//         <pre> {JSON.stringify(user.data.user, null, 2)} </pre>\
-//       </div>
-//     ) : (
-//       <Login />
-//     )}
-//   </div>
-// </div>
