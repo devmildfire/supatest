@@ -13,7 +13,8 @@ import { useState, useEffect } from "react";
 function Product() {
   // const router = useRouter();
   const [selectedType, setSelectedType] = useState("PrintedBook");
-  const [file, setFile] = useState([]);
+  // const [file, setFile] = useState([]);
+  const [filePath, setFilePath] = useState("");
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -28,7 +29,24 @@ function Product() {
 
   async function handleTrailerUpload(event) {
     event.preventDefault();
-    setFile(event.target.files[0]);
+    // setFile(event.target.files[0]);
+    const file = event.target.files[0];
+
+    // console.log("setting file");
+    console.log(file);
+
+    const { data, error } = await supabase.storage
+      .from("covers")
+      .upload(`public/file_${file.name}`, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setFilePath(data.path);
+    console.log("file path ...", data.path);
+
+    console.log("file return info ...", JSON.stringify(data, null, 2));
+    console.log("file return error ...", JSON.stringify(error, null, 2));
   }
 
   async function handleSubmit(event) {
@@ -38,6 +56,7 @@ function Product() {
     const category = event.target.category.value;
     const price = event.target.price.value;
     const discount = event.target.discount.value;
+    const trailer = filePath;
     event.target.reset();
 
     const { data, error } = await supabase
@@ -59,7 +78,7 @@ function Product() {
       // const coverFile = event.target.trailer.files[0];
       // const coverFileInput = event.target.trailer;
 
-      console.log("cover File ... ", file);
+      // console.log("cover File ... ", file);
       // const productID = event.target.discount.value;
 
       const { printed_data, printed_error } = await supabase
@@ -67,6 +86,7 @@ function Product() {
         .insert({
           description: description,
           thesis: thesis,
+          trailer: trailer,
           pages: pages,
           ProductID: product_id,
         })
