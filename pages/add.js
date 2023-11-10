@@ -51,8 +51,9 @@ function Product() {
       const thesis = event.target.thesis.value;
       const pages = event.target.pages.value;
       const coverFile = event.target.trailer.files[0];
+      const coverFileInput = event.target.trailer;
 
-      console.log("cover File ... ", coverFile);
+      console.log("cover File input... ", coverFileInput);
       // const productID = event.target.discount.value;
 
       const { printed_data, printed_error } = await supabase
