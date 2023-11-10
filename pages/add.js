@@ -43,19 +43,27 @@ function Product() {
         discount: discount,
       })
       .select();
+
     const product_id = await data[0].id;
 
-    // (selectedType == "PrintedBook") ? (
-    //   const { printed_data, printed_error } = await supabase
-    //   .from("PrintedBooks")
-    //   .insert({
-    //     name: name,
-    //     category: category,
-    //     price: price,
-    //     discount: discount,
-    //   })
-    //   .select()
-    // ) : ()
+    if (selectedType == "PrintedBook") {
+      const description = event.target.description.value;
+      const thesis = event.target.thesis.value;
+      const pages = event.target.pages.value;
+      // const productID = event.target.discount.value;
+
+      const { printed_data, printed_error } = await supabase
+        .from("PrintedBooks")
+        .insert({
+          description: description,
+          thesis: thesis,
+          pages: pages,
+          ProductID: product_id,
+        })
+        .select();
+
+      console.log("printed data ... ", printed_data);
+    }
 
     console.log("product data ... ", data);
 
