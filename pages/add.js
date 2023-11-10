@@ -50,7 +50,7 @@ function Product() {
       const description = event.target.description.value;
       const thesis = event.target.thesis.value;
       const pages = event.target.pages.value;
-      const coverFile = event.target.files[0];
+      const coverFile = event.target.trailer[0];
 
       console.log("cover File ... ", coverFile);
       // const productID = event.target.discount.value;
