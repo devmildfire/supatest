@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 function Product() {
   // const router = useRouter();
   const [selectedType, setSelectedType] = useState("PrintedBook");
+  const [file, setFile] = useState([]);
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -23,6 +24,11 @@ function Product() {
 
     setSelectedType(value);
     console.log(selectedType);
+  }
+
+  async function handleTrailerUpload(event) {
+    event.preventDefault();
+    setFile(event.target.files[0]);
   }
 
   async function handleSubmit(event) {
@@ -50,10 +56,10 @@ function Product() {
       const description = event.target.description.value;
       const thesis = event.target.thesis.value;
       const pages = event.target.pages.value;
-      const coverFile = event.target.trailer.files[0];
-      const coverFileInput = event.target.trailer;
+      // const coverFile = event.target.trailer.files[0];
+      // const coverFileInput = event.target.trailer;
 
-      console.log("cover File input... ", coverFileInput);
+      console.log("cover File ... ", file);
       // const productID = event.target.discount.value;
 
       const { printed_data, printed_error } = await supabase
@@ -146,8 +152,8 @@ function Product() {
               defaultValue="123"
             />
 
-            <label htmlFor="trailer"> trailer </label>
-            <input type="file" min="0" id="trailer" name="trailer" />
+            {/* <label htmlFor="trailer"> trailer </label>
+            <input type="file" min="0" id="trailer" name="trailer" /> */}
           </>
         )}
 
@@ -155,7 +161,19 @@ function Product() {
           Add New Product
         </button>
       </form>
-      {/* <pre> {JSON.stringify(session, null, 2)} </pre> */}
+      {/* <form onSubmit={handleTrailerUpload} className={styles.form}> */}
+      <label htmlFor="trailer"> trailer </label>
+      <input
+        type="file"
+        id="trailer"
+        name="trailer"
+        onChange={handleTrailerUpload}
+      />
+
+      {/* <button type="submit" className={styles.button}>
+          Add New Trailer
+        </button> */}
+      {/* </form> */}
     </div>
   );
 }
