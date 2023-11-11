@@ -15,6 +15,10 @@ function Product() {
   const [selectedType, setSelectedType] = useState("PrintedBook");
   // const [file, setFile] = useState([]);
   const [filePath, setFilePath] = useState("");
+  const [fileURL, setFileURL] = useState("");
+
+  const [videoFilePath, setVideoFilePath] = useState("");
+  const [VideoFileURL, setVideoFileURL] = useState("");
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -27,7 +31,7 @@ function Product() {
     console.log(selectedType);
   }
 
-  async function handleTrailerUpload(event) {
+  async function handleCoverUpload(event) {
     event.preventDefault();
     // setFile(event.target.files[0]);
     const file = event.target.files[0];
@@ -47,6 +51,102 @@ function Product() {
 
     console.log("file return info ...", JSON.stringify(data, null, 2));
     console.log("file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("covers")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setFileURL(publicUrl);
+  }
+
+  async function handleTrailerUpload(event) {
+    event.preventDefault();
+
+    const videoFile = event.target.files[0];
+
+    console.log(videoFile);
+
+    const { data, error } = await supabase.storage
+      .from("trailers")
+      .upload(`public/file_${videoFile.name}`, videoFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setVideoFilePath(data.path);
+    console.log("video file path ...", data.path);
+
+    console.log("video file return info ...", JSON.stringify(data, null, 2));
+    console.log("video file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("trailers")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setVideoFileURL(publicUrl);
+  }
+
+  async function setPrintedData(target, productID) {
+    const description = target.description.value;
+    const thesis = target.thesis.value;
+    const pages = target.pages.value;
+    const trailer = VideoFileURL;
+    // const cover = filePath;
+
+    const { data, error } = await supabase
+      .from("PrintedBooks")
+      .insert({
+        description: description,
+        thesis: thesis,
+        trailer: trailer,
+        pages: pages,
+        ProductID: productID,
+      })
+      .select("*")
+      .single();
+
+    console.log("printed data ... ", data);
+    console.log("printed data ... ", JSON.stringify(data, null, 2));
+    console.log("printed error ... ", error);
+
+    const printedBook_ID = data ? data.id : "no ID for me";
+
+    console.log("printed Book ID ... ", printedBook_ID);
+
+    return printedBook_ID;
+  }
+
+  async function setCoverData(coverUrl, printedBookID) {
+    // const cover = filePath;
+
+    const { data, error } = await supabase
+      .from("PrintedCover")
+      .insert({
+        PrintedBookID: printedBookID,
+        source: coverUrl,
+        shade: "light",
+        blurHash: "NoHash",
+      })
+      .select("*")
+      .single();
+
+    console.log("cover data ... ", data);
+    console.log("cover data ... ", JSON.stringify(data, null, 2));
+    console.log("cover error ... ", error);
+
+    const cover_ID = data ? data.id : "no ID for me";
+
+    console.log("printed Book ID ... ", cover_ID);
+
+    return cover_ID;
   }
 
   async function handleSubmit(event) {
@@ -56,7 +156,7 @@ function Product() {
     const category = event.target.category.value;
     const price = event.target.price.value;
     const discount = event.target.discount.value;
-    const trailer = filePath;
+
     event.target.reset();
 
     const { data, error } = await supabase
@@ -67,32 +167,16 @@ function Product() {
         price: price,
         discount: discount,
       })
-      .select();
+      .select("*");
 
     const product_id = await data[0].id;
 
     if (selectedType == "PrintedBook") {
-      const description = event.target.description.value;
-      const thesis = event.target.thesis.value;
-      const pages = event.target.pages.value;
-      // const coverFile = event.target.trailer.files[0];
-      // const coverFileInput = event.target.trailer;
+      const printedBookID = await setPrintedData(event.target, product_id);
+      console.log("printed Book ID ... ", printedBookID);
 
-      // console.log("cover File ... ", file);
-      // const productID = event.target.discount.value;
-
-      const { printed_data, printed_error } = await supabase
-        .from("PrintedBooks")
-        .insert({
-          description: description,
-          thesis: thesis,
-          trailer: trailer,
-          pages: pages,
-          ProductID: product_id,
-        })
-        .select();
-
-      console.log("printed data ... ", printed_data);
+      const coverID = await setCoverData(fileURL, printedBookID);
+      console.log("Cover ID ... ", coverID);
     }
 
     console.log("product data ... ", data);
@@ -171,9 +255,6 @@ function Product() {
               name="pages"
               defaultValue="123"
             />
-
-            {/* <label htmlFor="trailer"> trailer </label>
-            <input type="file" min="0" id="trailer" name="trailer" /> */}
           </>
         )}
 
@@ -181,8 +262,13 @@ function Product() {
           Add New Product
         </button>
       </form>
-      {/* <form onSubmit={handleTrailerUpload} className={styles.form}> */}
+
+      <label htmlFor="cover"> Cover </label>
+      {filePath && <img src={fileURL} alt={filePath} />}
+      <input type="file" id="cover" name="cover" onChange={handleCoverUpload} />
+
       <label htmlFor="trailer"> trailer </label>
+      {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
       <input
         type="file"
         id="trailer"
