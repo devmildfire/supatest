@@ -20,6 +20,8 @@ function Product() {
   const [videoFilePath, setVideoFilePath] = useState("");
   const [VideoFileURL, setVideoFileURL] = useState("");
 
+  const [awards, setAwards] = useState([]);
+
   function handleTypeChange(event) {
     const target = event.target;
     const value = target.value;
@@ -203,6 +205,14 @@ function Product() {
     return printSizeID;
   }
 
+  async function handleAwardsChange(event) {
+    const checkBox = event.target;
+
+    checkBox.checked == true
+      ? console.log("got some awards!")
+      : console.log("got NONE awards!");
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -292,6 +302,16 @@ function Product() {
           name="discount"
           defaultValue="0"
         />
+
+        <div>
+          <label htmlFor="awards"> This product has Awards </label>
+          <input
+            type="checkbox"
+            id="awards"
+            name="awards"
+            onChange={handleAwardsChange}
+          />
+        </div>
 
         {selectedType == "PrintedBook" && (
           <div className={styles.container}>
