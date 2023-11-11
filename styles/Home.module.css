@@ -2,23 +2,23 @@
   outline: 1px solid green;
   color: grey;
 
-  padding: 5vw;
+  padding: 1vw;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 5vh auto;
+  margin: 5vw auto;
   gap: 2vh;
 }
 
 .form {
-  padding: 2vw;
+  padding: 1vw;
   outline: 1px solid red;
   display: flex;
   flex-direction: column;
   /* max-width: 200px; */
   align-items: center;
-  margin: 5vh auto;
+  margin: 5vw auto;
   gap: 2vh;
 }
 
@@ -26,5 +26,5 @@
   border: 1px solid white;
   color: white;
   background-color: red;
-  padding: 10px;
+  padding: 0px 20px;
 }

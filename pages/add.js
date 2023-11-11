@@ -149,6 +149,60 @@ function Product() {
     return cover_ID;
   }
 
+  async function setPrintOptionsData(target, printedBookID) {
+    const bindings = target.bindings.value;
+    const coverType = target.coverType.value;
+    const paper = target.paper.value;
+    const illustrations = target.illustrations.value;
+
+    const { data, error } = await supabase
+      .from("PrintOptions")
+      .insert({
+        bindings: bindings,
+        cover: coverType,
+        paper: paper,
+        illustrations: illustrations,
+        PrintedBookID: printedBookID,
+      })
+      .select("*")
+      .single();
+
+    console.log("print options data ... ", data);
+    console.log("print options data ... ", JSON.stringify(data, null, 2));
+    console.log("print options error ... ", error);
+
+    const printOptionsID = data ? data.id : "no ID for me";
+
+    console.log("print Options ID ... ", printOptionsID);
+
+    return printOptionsID;
+  }
+
+  async function setPrintSizeData(target, printOptionsID) {
+    const width = target.width.value;
+    const height = target.height.value;
+
+    const { data, error } = await supabase
+      .from("PrintSize")
+      .insert({
+        width: width,
+        height: height,
+        PrintOptionsID: printOptionsID,
+      })
+      .select("*")
+      .single();
+
+    console.log("print size data ... ", data);
+    console.log("print size data ... ", JSON.stringify(data, null, 2));
+    console.log("print size error ... ", error);
+
+    const printSizeID = data ? data.id : "no ID for me";
+
+    console.log("print Size ID ... ", printSizeID);
+
+    return printSizeID;
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -177,6 +231,18 @@ function Product() {
 
       const coverID = await setCoverData(fileURL, printedBookID);
       console.log("Cover ID ... ", coverID);
+
+      const printedOptionsID = await setPrintOptionsData(
+        event.target,
+        printedBookID
+      );
+      console.log("Printed Options ID ... ", printedOptionsID);
+
+      const printSizeID = await setPrintSizeData(
+        event.target,
+        printedOptionsID
+      );
+      console.log("Print Size ID ... ", printSizeID);
     }
 
     console.log("product data ... ", data);
@@ -228,7 +294,9 @@ function Product() {
         />
 
         {selectedType == "PrintedBook" && (
-          <>
+          <div className={styles.container}>
+            <h1> Printed Book options </h1>
+
             <label htmlFor="description"> description </label>
             <input
               type="text"
@@ -255,26 +323,64 @@ function Product() {
               name="pages"
               defaultValue="123"
             />
-          </>
+
+            <label htmlFor="bindings"> Bindings </label>
+            <input
+              type="text"
+              id="bindings"
+              name="bindings"
+              defaultValue="HardCore!"
+            />
+
+            <label htmlFor="coverType"> CoverType </label>
+            <input
+              type="text"
+              id="coverType"
+              name="coverType"
+              defaultValue="DisCover!"
+            />
+
+            <label htmlFor="paper"> Paper </label>
+            <input type="text" id="paper" name="paper" defaultValue="TwoPly" />
+
+            <label htmlFor="illustrations"> Illustrations </label>
+            <input
+              type="text"
+              id="illustrations"
+              name="illustrations"
+              defaultValue="Dazzling!"
+            />
+
+            <label htmlFor="width"> Width </label>
+            <input type="number" id="width" name="width" defaultValue="42" />
+
+            <label htmlFor="height"> Height </label>
+            <input type="number" id="height" name="height" defaultValue="42" />
+
+            <label htmlFor="cover"> Cover </label>
+            {filePath && <img src={fileURL} alt={filePath} />}
+            <input
+              type="file"
+              id="cover"
+              name="cover"
+              onChange={handleCoverUpload}
+            />
+
+            <label htmlFor="trailer"> trailer </label>
+            {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
+            <input
+              type="file"
+              id="trailer"
+              name="trailer"
+              onChange={handleTrailerUpload}
+            />
+          </div>
         )}
 
         <button type="submit" className={styles.button}>
           Add New Product
         </button>
       </form>
-
-      <label htmlFor="cover"> Cover </label>
-      {filePath && <img src={fileURL} alt={filePath} />}
-      <input type="file" id="cover" name="cover" onChange={handleCoverUpload} />
-
-      <label htmlFor="trailer"> trailer </label>
-      {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
-      <input
-        type="file"
-        id="trailer"
-        name="trailer"
-        onChange={handleTrailerUpload}
-      />
 
       {/* <button type="submit" className={styles.button}>
           Add New Trailer
