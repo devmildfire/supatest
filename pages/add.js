@@ -387,6 +387,8 @@ function Product() {
 
       <div className={styles.container}>
         <Link href="/">Back to home</Link>
+        <Link href="/login">Login</Link>
+        <Link href="/awards">Add / Remove Awards</Link>
         <Link href="/deleteProduct">Delete Products</Link>
       </div>
     </div>

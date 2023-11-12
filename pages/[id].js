@@ -43,6 +43,12 @@ export default function ProductPage({ product }) {
       <p> {product.category} </p>
       <p> {product.price} </p>
       <pre> {JSON.stringify(product, null, 2)} </pre>
+      <div className={styles.container}>
+        <Link href="/login">Login</Link>
+        <Link href="/awards">Add / Remove Awards</Link>
+        <Link href="/add">Add Products</Link>
+        <Link href="/deleteProduct">Delete Products</Link>
+      </div>
     </div>
   );
 }

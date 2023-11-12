@@ -86,6 +86,12 @@ export default function ProductPage({ params }) {
       ) : (
         <div> No User Session </div>
       )}
+      <div className={styles.container}>
+        <Link href="/login">Login</Link>
+        <Link href="/awards">Add / Remove Awards</Link>
+        <Link href="/add">Add Products</Link>
+        <Link href="/deleteProduct">Delete Products</Link>
+      </div>
     </div>
   );
 }

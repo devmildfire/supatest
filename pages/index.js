@@ -23,6 +23,12 @@ export default function Home({ products }) {
   return (
     <div className={styles.container}>
       <h1>Hello!</h1>
+      <div className={styles.container}>
+        <Link href="/login">Login</Link>
+        <Link href="/awards">Add / Remove Awards</Link>
+        <Link href="/add">Add Products</Link>
+        <Link href="/deleteProduct">Delete Products</Link>
+      </div>
       <pre> {JSON.stringify(products, null, 2)} </pre>
     </div>
   );
