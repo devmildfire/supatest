@@ -53,7 +53,7 @@ export default function ProductPage({ params }) {
           ),
           cover:PrintedCover( * )
         ),
-        Awards ( * )
+        ProductsAwards ( *,  awards: Awards(*) )
         `
         )
         .eq("name", params.title);

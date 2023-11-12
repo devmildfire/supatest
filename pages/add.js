@@ -303,16 +303,6 @@ function Product() {
           defaultValue="0"
         />
 
-        <div>
-          <label htmlFor="awards"> This product has Awards </label>
-          <input
-            type="checkbox"
-            id="awards"
-            name="awards"
-            onChange={handleAwardsChange}
-          />
-        </div>
-
         {selectedType == "PrintedBook" && (
           <div className={styles.container}>
             <h1> Printed Book options </h1>

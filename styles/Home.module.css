@@ -9,6 +9,9 @@
   align-items: center;
   margin: 5vw auto;
   gap: 2vh;
+
+  max-width: 95vw;
+  overflow: hidden;
 }
 
 .awardsContainer {
