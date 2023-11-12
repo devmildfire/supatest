@@ -2,6 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 function RemoveProduct() {
   const [products, setProducts] = useState([]);

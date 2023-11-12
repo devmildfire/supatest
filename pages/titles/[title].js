@@ -1,6 +1,7 @@
 import supabase from "@/utils/supabase";
 import styles from "../../styles/Home.module.css";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export async function getServerSideProps({ params }) {
   return {

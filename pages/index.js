@@ -1,7 +1,6 @@
-// import Image from "next/image";
-// import { Inter } from "next/font/google";
 import styles from "../styles/Home.module.css";
 import supabase from "../utils/supabase";
+import Link from "next/link";
 
 export async function getStaticProps() {
   const { data: products, error } = await supabase.from("Products").select("*");

@@ -1,7 +1,7 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
+import Link from "next/link";
 
-// "*, Audiobooks( * ), Ebooks ( * ), PrintedBooks ( *, options:PrintOptions ( *, size:PrintSize( * ) ), cover:PrintedCover( * ) ), Awards ( * ) "
 export async function getServerSideProps({ params }) {
   const { data: product, error } = await supabase
     .from("Products")
