@@ -1,9 +1,11 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 function Award() {
   const [fileURL, setFileURL] = useState("");
+  const router = useRouter();
 
   async function handleImageUpload(event) {
     event.preventDefault();
@@ -55,6 +57,7 @@ function Award() {
     console.log("award id ... ", award_id);
 
     error ? alert(error) : alert(`Created New Award with name ${title}`);
+    router.reload();
   }
 
   return (
@@ -162,8 +165,8 @@ function ManageAwards() {
   const [awardsList, setAwardsList] = useState([]);
   const [productsAwardsList, setProductsAwardsList] = useState([]);
 
-  const [product, setProduct] = useState(1);
-  const [award, setAward] = useState(1);
+  const [product, setProduct] = useState(null);
+  const [award, setAward] = useState(null);
 
   const [awardLegal, setAwardLegal] = useState(false);
 
@@ -285,13 +288,19 @@ function ManageAwards() {
       <div>
         <form className={styles.container}>
           <select onChange={handleProdChange}>
+            <option disabled selected value>
+              -- select Product --
+            </option>
             {productsList.map((product) => (
               <option key={product.id} value={product.id}>
-                {product.name} - {product.category}
+                {product.id} - {product.name} - {product.category}
               </option>
             ))}
           </select>
           <select onChange={handleAwardChange}>
+            <option disabled selected value>
+              -- select Award --
+            </option>
             {awardsList.map((award) => (
               <option key={award.id} value={award.id}>
                 {award.title}
