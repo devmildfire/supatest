@@ -11,6 +11,17 @@
   gap: 2vh;
 }
 
+.awardsContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+}
+
+.award {
+  padding: 5px 15px;
+}
+
 .form {
   padding: 1vw;
   outline: 1px solid red;
