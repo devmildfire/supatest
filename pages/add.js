@@ -1,6 +1,7 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 // export async function getServerSideProps({ params }) {
 //   return {
@@ -205,14 +206,6 @@ function Product() {
     return printSizeID;
   }
 
-  async function handleAwardsChange(event) {
-    const checkBox = event.target;
-
-    checkBox.checked == true
-      ? console.log("got some awards!")
-      : console.log("got NONE awards!");
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -392,10 +385,10 @@ function Product() {
         </button>
       </form>
 
-      {/* <button type="submit" className={styles.button}>
-          Add New Trailer
-        </button> */}
-      {/* </form> */}
+      <div className={styles.container}>
+        <Link href="/">Back to home</Link>
+        <Link href="/deleteProduct">Delete Products</Link>
+      </div>
     </div>
   );
 }
