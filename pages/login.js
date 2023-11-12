@@ -159,7 +159,13 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* {!session && <Login />} */}
+      <div className={styles.container}>
+        <Link href="/">Back to home</Link>
+        <Link href="/awards">Add / Remove Awards</Link>
+        <Link href="/add">Add Products</Link>
+        <Link href="/deleteProduct">Delete Products</Link>
+        <Link href="/titles/Awesome Title">Awesome Title</Link>
+      </div>
     </div>
   );
 }
