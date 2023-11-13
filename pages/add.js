@@ -3,14 +3,6 @@ import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-// export async function getServerSideProps({ params }) {
-//   return {
-//     props: {
-//       params,
-//     },
-//   };
-// }
-
 function Product() {
   // const router = useRouter();
   const [selectedType, setSelectedType] = useState("PrintedBook");
@@ -251,7 +243,6 @@ function Product() {
     console.log("product data ... ", data);
 
     console.log("product id ... ", product_id);
-    // console.log("error from login ...", error);
 
     error ? alert(error) : alert(`Created New Product with name ${name}`);
 
@@ -377,6 +368,44 @@ function Product() {
               name="trailer"
               onChange={handleTrailerUpload}
             />
+          </div>
+        )}
+
+        {selectedType == "AudioBook" && (
+          <div className={styles.container}>
+            <h1> Audio Book options </h1>
+
+            <div className={styles.container}>
+              <h1> Duration </h1>
+              <label htmlFor="hours"> Hours </label>
+              <input
+                type="number"
+                id="hours"
+                name="hours"
+                defaultValue="0"
+                min="0"
+              />
+
+              <label htmlFor="minutes"> Minutes </label>
+              <input
+                type="number"
+                id="minutes"
+                name="minutes"
+                defaultValue="0"
+                min="0"
+                max="59"
+              />
+
+              <label htmlFor="seconds"> Seconds </label>
+              <input
+                type="number"
+                id="seconds"
+                name="seconds"
+                defaultValue="0"
+                min="0"
+                max="59"
+              />
+            </div>
           </div>
         )}
 
