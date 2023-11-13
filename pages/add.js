@@ -215,6 +215,31 @@ function Product() {
     return audioBook_ID;
   }
 
+  async function setEBookData(target, productID) {
+    const extention = target.eBookExtention.value;
+    const eBookURL = eBookFileURL;
+
+    const { data, error } = await supabase
+      .from("Ebooks")
+      .insert({
+        extention: extention,
+        source: eBookURL,
+        ProductID: productID,
+      })
+      .select("*")
+      .single();
+
+    console.log("ebook data ... ", data);
+    console.log("ebook data ... ", JSON.stringify(data, null, 2));
+    console.log("ebook error ... ", error);
+
+    const eBook_ID = data ? data.id : "no ID for me";
+
+    console.log("eBook ID ... ", eBook_ID);
+
+    return eBook_ID;
+  }
+
   async function setCoverData(coverUrl, printedBookID) {
     // const cover = filePath;
 
@@ -337,6 +362,11 @@ function Product() {
     if (selectedType == "AudioBook") {
       const audioBookID = await setAudioData(event.target, product_id);
       console.log("AudioBook ID ... ", audioBookID);
+    }
+
+    if (selectedType == "Ebook") {
+      const eBookID = await setEBookData(event.target, product_id);
+      console.log("Ebook ID ... ", eBookID);
     }
 
     console.log("product data ... ", data);
