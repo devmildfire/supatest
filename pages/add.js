@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 function Product() {
-  // const router = useRouter();
   const [selectedType, setSelectedType] = useState("PrintedBook");
-  // const [file, setFile] = useState([]);
+
   const [filePath, setFilePath] = useState("");
   const [fileURL, setFileURL] = useState("");
 
@@ -15,6 +14,9 @@ function Product() {
 
   const [audioFilePath, setAudioFilePath] = useState("");
   const [AudioFileURL, setAudioFileURL] = useState("");
+
+  const [eBookFilePath, setEBookFilePath] = useState("");
+  const [eBookFileURL, setEBookFileURL] = useState("");
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -88,6 +90,37 @@ function Product() {
     console.log(`${publicUrl} returned`);
 
     setVideoFileURL(publicUrl);
+  }
+
+  async function handleEBookUpload(event) {
+    event.preventDefault();
+
+    const eBookFile = event.target.files[0];
+
+    console.log(eBookFile);
+
+    const { data, error } = await supabase.storage
+      .from("eBooks")
+      .upload(`/file_${eBookFile.name}`, eBookFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setEBookFilePath(data.path);
+    console.log("eBook file path ...", data.path);
+
+    console.log("eBook file return info ...", JSON.stringify(data, null, 2));
+    console.log("eBook file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("eBooks")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setEBookFileURL(publicUrl);
   }
 
   async function handleAudioUpload(event) {
@@ -495,6 +528,33 @@ function Product() {
               id="audioFile"
               name="audioFile"
               onChange={handleAudioUpload}
+            />
+          </div>
+        )}
+
+        {selectedType == "Ebook" && (
+          <div className={styles.container}>
+            <h1> E-Book options </h1>
+
+            <label htmlFor="eBookExtention">E-Book File Extention </label>
+            <select id="eBookExtention" name="eBookExtention">
+              <option value="epub"> epub </option>
+              <option value="fb2"> fb2 </option>
+              <option value="cbr"> cbr </option>
+              <option value="opf"> opf </option>
+              <option value="mobi"> mobi </option>
+              <option value="orb"> orb </option>
+              <option value="ibooks"> ibooks </option>
+              <option value="edt"> edt </option>
+            </select>
+
+            <label htmlFor="ebookFile"> eBook File </label>
+            {audioFilePath && <audio src={AudioFileURL} alt={audioFilePath} />}
+            <input
+              type="file"
+              id="ebookFile"
+              name="ebookFile"
+              onChange={handleEBookUpload}
             />
           </div>
         )}
