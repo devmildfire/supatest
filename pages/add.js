@@ -152,9 +152,9 @@ function Product() {
   }
 
   async function setAudioData(target, productID) {
-    const hours = target.hours.value;
-    const minutes = target.minutes.value;
-    const seconds = target.seconds.value;
+    const hours = +target.hours.value;
+    const minutes = +target.minutes.value;
+    const seconds = +target.seconds.value;
 
     const duration = hours * 3600 + minutes * 60 + seconds;
     const extention = target.extention.value;
