@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Nav from "@/components/nav";
 
 function RemoveProduct() {
   const [products, setProducts] = useState([]);
@@ -121,12 +122,7 @@ export default function RemoveProductPage({ products }) {
       ) : (
         <div> No User Session </div>
       )}
-      <div className={styles.container}>
-        <Link href="/login">Login</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/add">Add Products</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-      </div>
+      <Nav />
     </div>
   );
 }

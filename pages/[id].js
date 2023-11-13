@@ -2,6 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Nav from "@/components/nav";
 
 export async function getServerSideProps({ params }) {
   return {
@@ -81,17 +82,12 @@ export default function ProductPage({ params }) {
       {session ? (
         <div className={styles.container}>
           <p> logged in as {user.email} </p>
-          <p> {products && JSON.stringify(products, null, 2)} </p>
+          <pre> {products && JSON.stringify(products, null, 2)} </pre>
         </div>
       ) : (
         <div> No User Session </div>
       )}
-      <div className={styles.container}>
-        <Link href="/login">Login</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/add">Add Products</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-      </div>
+      <Nav />
     </div>
   );
 }

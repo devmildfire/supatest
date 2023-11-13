@@ -2,6 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Nav from "@/components/nav";
 
 function Product() {
   const [selectedType, setSelectedType] = useState("PrintedBook");
@@ -594,12 +595,7 @@ function Product() {
         </button>
       </form>
 
-      <div className={styles.container}>
-        <Link href="/">Back to home</Link>
-        <Link href="/login">Login</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-      </div>
+      <Nav />
     </div>
   );
 }

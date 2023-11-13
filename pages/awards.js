@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Nav from "@/components/nav";
 
 function Award() {
   const [fileURL, setFileURL] = useState("");
@@ -97,7 +98,8 @@ function ProductsAwards() {
     try {
       const { data, error } = await supabase
         .from("Products")
-        .select(`id, name, ProductsAwards(*, Awards(*))`);
+        .select(`id, name, ProductsAwards(*, Awards(*))`)
+        .order("id", { ascending: true });
 
       if (error) {
         console.error(error);
@@ -174,7 +176,8 @@ function ManageAwards() {
   async function getProdList() {
     const supaProds = await supabase
       .from("Products")
-      .select(`id, name, category`);
+      .select(`id, name, category`)
+      .order("id", { ascending: true });
 
     supaProds.error && console.error(supaProds.error);
     supaProds.data &&
@@ -185,7 +188,8 @@ function ManageAwards() {
   async function getAwardList() {
     const supaAwards = await supabase
       .from("Awards")
-      .select(`id, title, source`);
+      .select(`id, title, source`)
+      .order("id", { ascending: true });
 
     supaAwards.error && console.error(supaAwards.error);
     supaAwards.data &&
@@ -359,12 +363,7 @@ export default function AddAwardPage() {
       ) : (
         <div> No User Session </div>
       )}
-      <div className={styles.container}>
-        <Link href="/login">Login</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/add">Add Products</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-      </div>
+      <Nav />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
+import Nav from "@/components/nav";
 
 function Login() {
   const router = useRouter();
@@ -159,13 +159,7 @@ export default function LoginPage() {
         </div>
       )}
 
-      <div className={styles.container}>
-        <Link href="/">Back to home</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/add">Add Products</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-        <Link href="/titles/Awesome Title">Awesome Title</Link>
-      </div>
+      <Nav />
     </div>
   );
 }
