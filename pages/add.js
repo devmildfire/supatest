@@ -163,7 +163,7 @@ function Product() {
     const { data, error } = await supabase
       .from("Audiobooks")
       .insert({
-        duration: hours,
+        duration: duration,
         fileExtention: extention,
         src: audioURL,
         productID: productID,
