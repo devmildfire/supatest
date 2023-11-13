@@ -13,7 +13,8 @@ function Product() {
   const [videoFilePath, setVideoFilePath] = useState("");
   const [VideoFileURL, setVideoFileURL] = useState("");
 
-  const [awards, setAwards] = useState([]);
+  const [audioFilePath, setAudioFilePath] = useState("");
+  const [AudioFileURL, setAudioFileURL] = useState("");
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -87,6 +88,37 @@ function Product() {
     console.log(`${publicUrl} returned`);
 
     setVideoFileURL(publicUrl);
+  }
+
+  async function handleAudioUpload(event) {
+    event.preventDefault();
+
+    const audioFile = event.target.files[0];
+
+    console.log(audioFile);
+
+    const { data, error } = await supabase.storage
+      .from("audiobooks")
+      .upload(`/file_${audioFile.name}`, audioFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setAudioFilePath(data.path);
+    console.log("audio file path ...", data.path);
+
+    console.log("audio file return info ...", JSON.stringify(data, null, 2));
+    console.log("audio file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("audiobooks")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setAudioFileURL(publicUrl);
   }
 
   async function setPrintedData(target, productID) {
@@ -406,6 +438,26 @@ function Product() {
                 max="59"
               />
             </div>
+
+            <label htmlFor="extention">File Extention </label>
+            <select id="extention" name="extention">
+              <option value="MP3"> MP3 </option>
+              <option value="AAC"> AAC </option>
+              <option value="AAX"> AAX </option>
+              <option value="M4A"> M4A </option>
+              <option value="M4B"> M4B </option>
+              <option value="OGG"> OGG </option>
+              <option value="WMA"> WMA </option>
+            </select>
+
+            <label htmlFor="audioFile"> Audio File </label>
+            {audioFilePath && <audio src={AudioFileURL} alt={audioFilePath} />}
+            <input
+              type="file"
+              id="audioFile"
+              name="audioFile"
+              onChange={handleAudioUpload}
+            />
           </div>
         )}
 
