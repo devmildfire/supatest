@@ -269,8 +269,6 @@ function Product() {
     const price = event.target.price.value;
     const discount = event.target.discount.value;
 
-    event.target.reset();
-
     const { data, error } = await supabase
       .from("Products")
       .insert({
@@ -311,6 +309,8 @@ function Product() {
     console.log("product data ... ", data);
 
     console.log("product id ... ", product_id);
+
+    event.target.reset();
 
     error
       ? alert(error)
