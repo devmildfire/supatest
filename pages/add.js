@@ -151,6 +151,37 @@ function Product() {
     return printedBook_ID;
   }
 
+  async function setAudioData(target, productID) {
+    const hours = target.hours.value;
+    const minutes = target.minutes.value;
+    const seconds = target.seconds.value;
+
+    const duration = hours * 3600 + minutes * 60 + seconds;
+    const extention = target.extention.value;
+    const audioURL = AudioFileURL;
+
+    const { data, error } = await supabase
+      .from("Audiobooks")
+      .insert({
+        duration: duration,
+        fileExtention: extention,
+        src: audioURL,
+        productID: productID,
+      })
+      .select("*")
+      .single();
+
+    console.log("audiobook data ... ", data);
+    console.log("audiobook data ... ", JSON.stringify(data, null, 2));
+    console.log("audiobook error ... ", error);
+
+    const audioBook_ID = data ? data.id : "no ID for me";
+
+    console.log("audio Book ID ... ", audioBook_ID);
+
+    return audioBook_ID;
+  }
+
   async function setCoverData(coverUrl, printedBookID) {
     // const cover = filePath;
 
@@ -272,11 +303,18 @@ function Product() {
       console.log("Print Size ID ... ", printSizeID);
     }
 
+    if (selectedType == "AudioBook") {
+      const audioBookID = await setAudioData(event.target, product_id);
+      console.log("AudioBook ID ... ", audioBookID);
+    }
+
     console.log("product data ... ", data);
 
     console.log("product id ... ", product_id);
 
-    error ? alert(error) : alert(`Created New Product with name ${name}`);
+    error
+      ? alert(error)
+      : alert(`Created New ${selectedType} Product with name ${name}`);
 
     // router.reload();
   }
