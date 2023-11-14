@@ -98,7 +98,7 @@ function ProductsAwards() {
     try {
       const { data, error } = await supabase
         .from("Products")
-        .select(`id, name, ProductsAwards(*, Awards(*))`)
+        .select(`id, name, category, ProductsAwards(*, Awards(*))`)
         .order("id", { ascending: true });
 
       if (error) {
@@ -132,7 +132,7 @@ function ProductsAwards() {
           item.ProductsAwards.length > 0 && (
             <div key={item.id}>
               <p className={styles.awardsContainer}>
-                {item.id} - {item.name}
+                {item.id} - {item.name} - {item.category}
               </p>
 
               <div className={styles.awardsContainer}>

@@ -25,3 +25,9 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+pre {
+  /* overflow: scroll; */
+  /* align-self: flex-start; */
+  white-space: pre-wrap;
+}
