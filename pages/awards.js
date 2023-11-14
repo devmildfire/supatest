@@ -263,6 +263,45 @@ function ManageAwards() {
 
     console.log("insert error ... ", JSON.stringify(error, null, 2));
     console.log("insert data ... ", JSON.stringify(data, null, 2));
+
+    let prodName;
+    let awardName;
+
+    !error &&
+      ((prodName = await getProdNameByID(product)),
+      (awardName = await getAwardNameByID(award))) &&
+      confirm(` Sucessfuly added ${awardName} to product ${prodName} `) &&
+      router.reload();
+  }
+
+  async function getProdNameByID(id) {
+    const prodData = await supabase
+      .from("Products")
+      .select("name")
+      .eq("id", id)
+      .single();
+
+    let prodName;
+
+    prodData.error && console.error("could not retrieve name");
+    prodData.data && (prodName = prodData.data.name);
+
+    return prodName;
+  }
+
+  async function getAwardNameByID(id) {
+    const awardData = await supabase
+      .from("Awards")
+      .select("title")
+      .eq("id", id)
+      .single();
+
+    let awardName;
+
+    awardData.error && console.error("could not retrieve name");
+    awardData.data && (awardName = awardData.data.title);
+
+    return awardName;
   }
 
   async function removeAward(event) {
@@ -280,7 +319,16 @@ function ManageAwards() {
 
     console.log("delete error ... ", JSON.stringify(error, null, 2));
 
-    router.reload();
+    let prodName;
+    let awardName;
+
+    !error &&
+      ((prodName = await getProdNameByID(product)),
+      (awardName = await getAwardNameByID(award))) &&
+      confirm(` Sucessfuly removed ${awardName} from product ${prodName} `) &&
+      router.reload();
+
+    // router.reload();
   }
 
   return (
