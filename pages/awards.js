@@ -173,6 +173,8 @@ function ManageAwards() {
 
   const [awardLegal, setAwardLegal] = useState(false);
 
+  const router = useRouter();
+
   async function getProdList() {
     const supaProds = await supabase
       .from("Products")
@@ -247,13 +249,12 @@ function ManageAwards() {
     setAwardLegal(isLegal);
   }
 
-  async function addAward() {
+  async function addAward(event) {
+    event.preventDefault();
     const supaAwardData = await supabase.from("ProductsAwards").select();
 
     supaAwardData.error && console.error(supaAwardData.error);
     supaAwardData.data && console.log(JSON.stringify(supaAwardData, null, 2));
-    //   (console.log("INSERT SUCCESS !!!"),
-    //   console.log(JSON.stringify(supaAwardData, null, 2)));
 
     const { data, error } = await supabase
       .from("ProductsAwards")
@@ -264,18 +265,12 @@ function ManageAwards() {
     console.log("insert data ... ", JSON.stringify(data, null, 2));
   }
 
-  async function removeAward() {
+  async function removeAward(event) {
+    event.preventDefault();
     const supaAwardData = await supabase.from("ProductsAwards").select();
 
     supaAwardData.error && console.error(supaAwardData.error);
     supaAwardData.data && console.log(JSON.stringify(supaAwardData, null, 2));
-    //   (console.log("INSERT SUCCESS !!!"),
-    //   console.log(JSON.stringify(supaAwardData, null, 2)));
-
-    // const { data, error } = await supabase
-    //   .from("ProductsAwards")
-    //   .delete({ ProductID: product, AwardID: award })
-    //   .select();
 
     const { error } = await supabase
       .from("ProductsAwards")
@@ -284,7 +279,8 @@ function ManageAwards() {
       .eq("AwardID", award);
 
     console.log("delete error ... ", JSON.stringify(error, null, 2));
-    // console.log("delete data ... ", JSON.stringify(data, null, 2));
+
+    router.reload();
   }
 
   return (
@@ -292,8 +288,13 @@ function ManageAwards() {
       <h1> Manage Awards </h1>
       <div>
         <form className={styles.container}>
-          <select onChange={handleProdChange}>
-            <option disabled selected value>
+          <select
+            id="products"
+            name="products"
+            defaultValue="-- select Product --"
+            onChange={handleProdChange}
+          >
+            <option disabled value="-- select Product --">
               -- select Product --
             </option>
             {productsList.map((product) => (
@@ -302,8 +303,13 @@ function ManageAwards() {
               </option>
             ))}
           </select>
-          <select onChange={handleAwardChange}>
-            <option disabled selected value>
+          <select
+            id="awards"
+            name="awards"
+            defaultValue="-- select Award --"
+            onChange={handleAwardChange}
+          >
+            <option disabled value="-- select Award --">
               -- select Award --
             </option>
             {awardsList.map((award) => (
