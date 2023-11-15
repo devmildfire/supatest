@@ -4,9 +4,24 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Nav from "@/components/nav";
 
+// `
+// id,
+// name,
+
+// Audiobooks ( * ),
+// Ebooks ( * ),
+// PrintedBooks ( *,
+//   options:PrintOptions ( *,
+//     size:PrintSize( * )
+//   ),
+//   cover:PrintedCover( * )
+// ),
+// TitlesAwards ( *,  awards: Awards(*) )
+// `
+
 export default function AllProductsPage() {
   const [session, setSession] = useState(null);
-  const [products, setProducts] = useState(null);
+  const [titles, setTitles] = useState(null);
   const [user, setUser] = useState(null);
 
   const get_session = async () => {
@@ -23,36 +38,29 @@ export default function AllProductsPage() {
     }
   };
 
-  const get_products = async () => {
+  const get_titles = async () => {
     try {
-      const { data: products, error } = await supabase.from("Products").select(
+      // const { data, error } = await supabase.from("Titles").select();
+      let { data: Titles, error } = await supabase.from("Titles").select(
         `
-        id,
-        name,
-        category,
-        price,
-        discount,
-        sold,
-        isFeatured,
-        isPublished,
-        releaseDate,
-        publishDate,
-        Audiobooks ( * ),
-        Ebooks ( * ),
-        PrintedBooks ( *,
-          options:PrintOptions ( *,
-            size:PrintSize( * )
+          *,
+          Audiobooks ( * ),
+          Ebooks ( * ),
+          PrintedBooks ( *,
+            options:PrintOptions ( *,
+              size:PrintSize( * )
+            ),
+            cover:PrintedCover( * )
           ),
-          cover:PrintedCover( * )
-        ),
-        ProductsAwards ( *,  awards: Awards(*) )
+          TitlesAwards ( *,  awards: Awards(*) )
         `
       );
 
       if (error) {
         console.error(error);
       } else {
-        setProducts(products);
+        Titles && console.log("data is ...", JSON.stringify(Titles, null, 2));
+        setTitles(Titles);
       }
     } catch (error) {
       console.error(error);
@@ -61,7 +69,7 @@ export default function AllProductsPage() {
 
   useEffect(() => {
     get_session();
-    get_products();
+    get_titles();
   }, []);
 
   // console.log(products);
@@ -70,7 +78,7 @@ export default function AllProductsPage() {
       {session ? (
         <div className={styles.container}>
           <p> logged in as {user.email} </p>
-          <pre> {products && JSON.stringify(products, null, 2)} </pre>
+          <pre> {titles && JSON.stringify(titles, null, 2)} </pre>
         </div>
       ) : (
         <div> No User Session </div>

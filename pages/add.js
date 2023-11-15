@@ -231,18 +231,37 @@ function Product() {
     return audioBook_ID;
   }
 
-  async function setEBookData(target, productID) {
+  async function setEBookData(target, titleID) {
     const extention = target.eBookExtention.value;
     const eBookURL = eBookFileURL;
+    const fileVolume = target.fileVolume.value;
+    const characters = target.characters.value;
+    const extra = target.extra.value;
+    const isPublished = target.isPublished.value;
+    const isFeatured = target.isFeatured.value;
+    const price = target.price.value;
+    const discount = target.discount.value;
+    const sold = target.sold.value;
+    const publishDate = target.publishDate.value;
+    const releaseDate = target.releaseDate.value;
 
     const { data, error } = await supabase
       .from("Ebooks")
       .insert({
-        extention: extention,
-        source: eBookURL,
-        ProductID: productID,
+        src: eBookURL,
+        title_id: titleID,
+        file_volume: fileVolume,
+        characters: characters,
+        extra: extra,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
       })
-      .select("*")
+      .select()
       .single();
 
     console.log("ebook data ... ", data);
@@ -335,66 +354,102 @@ function Product() {
     return printSizeID;
   }
 
+  async function getTitleID(titleName) {
+    const { data, error } = await supabase
+      .from("Titles")
+      .select("*")
+      .eq("name", titleName)
+      .single();
+
+    if (error) {
+      console.error("getTitleID ERROR ... ", JSON.stringify(error, null, 2));
+      return 0;
+    }
+
+    if (data) {
+      console.log("getTitleID Data ... ", JSON.stringify(data, null, 2));
+      // return Object.keys(data).length && data.id
+      return data.id;
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
+
+    let submitSucessfull = true;
 
     const name = event.target.name.value;
     const description = event.target.description.value;
     const thesis = event.target.thesis.value;
     const ageRestriction = event.target.ageRestriction.value;
 
-    const { data, error } = await supabase
-      .from("Titles")
-      .insert({
-        name: name,
-        description: description,
-        thesis: thesis,
-        trailer: VideoFileURL,
-        age_restriction: ageRestriction,
-      })
-      .select("*");
+    let title_id = await getTitleID(name);
 
-    const title_id = await data[0].id;
+    if (!title_id) {
+      console.log("trying to make a new Title!");
+
+      const { data, error } = await supabase
+        .from("Titles")
+        .insert({
+          name: name,
+          description: description,
+          thesis: thesis,
+          trailer: VideoFileURL,
+          age_restriction: ageRestriction,
+        })
+        .select("*");
+
+      data && (title_id = await data[0].id);
+      error && console.error("error is ...", error);
+    }
 
     if (selectedType == "PrintedBook") {
       const printedBookID = await setPrintedData(event.target, title_id);
       console.log("printed Book ID ... ", printedBookID);
+      printedBookID == "no ID for me" && (submitSucessfull = false);
 
       const coverID = await setCoverData(fileURL, printedBookID);
       console.log("Cover ID ... ", coverID);
+      coverID == "no ID for me" && (submitSucessfull = false);
 
       const printedOptionsID = await setPrintOptionsData(
         event.target,
         printedBookID
       );
       console.log("Printed Options ID ... ", printedOptionsID);
+      printedOptionsID == "no ID for me" && (submitSucessfull = false);
 
       const printSizeID = await setPrintSizeData(
         event.target,
         printedOptionsID
       );
       console.log("Print Size ID ... ", printSizeID);
+      printSizeID == "no ID for me" && (submitSucessfull = false);
     }
 
     if (selectedType == "AudioBook") {
       const audioBookID = await setAudioData(event.target, title_id);
       console.log("AudioBook ID ... ", audioBookID);
+      audioBookID == "no ID for me" && (submitSucessfull = false);
     }
 
     if (selectedType == "Ebook") {
       const eBookID = await setEBookData(event.target, title_id);
       console.log("Ebook ID ... ", eBookID);
+      eBookID == "no ID for me" && (submitSucessfull = false);
     }
 
-    console.log("product data ... ", data);
+    // data && console.log("product data ... ", data);
 
     console.log("product id ... ", title_id);
 
     event.target.reset();
 
-    error
-      ? alert(error)
-      : alert(`Created New ${selectedType} Product with name ${name}`);
+    // error
+    //   ? alert(error)
+    submitSucessfull == true
+      ? alert(`Created New ${selectedType} Product with name ${name}`)
+      : alert(`Creation FAILED for ${selectedType} Product with name ${name}`);
 
     // router.reload();
   }
@@ -447,6 +502,59 @@ function Product() {
           defaultValue="0"
         />
 
+        <label htmlFor="isPublished"> Is Published </label>
+        <input
+          type="checkbox"
+          id="isPublished"
+          name="isPublished"
+          defaultChecked="checked"
+        />
+
+        <label htmlFor="publishDate"> Publish Date </label>
+        <input
+          type="date"
+          id="publishDate"
+          name="publishDate"
+          defaultValue="2010-10-10"
+        />
+
+        <label htmlFor="releaseDate"> Release Date </label>
+        <input
+          type="date"
+          id="releaseDate"
+          name="releaseDate"
+          defaultValue="2010-10-10"
+        />
+
+        <label htmlFor="isFeatured"> Is Featured </label>
+        <input
+          type="checkbox"
+          id="isFeatured"
+          name="isFeatured"
+          defaultChecked=""
+        />
+
+        <label htmlFor="price"> Price </label>
+        <input
+          type="number"
+          min="0"
+          id="price"
+          name="price"
+          defaultValue="150"
+        />
+
+        <label htmlFor="discount"> Discount </label>
+        <input
+          type="number"
+          min="0"
+          id="discount"
+          name="discount"
+          defaultValue="0"
+        />
+
+        <label htmlFor="sold"> Number Sold </label>
+        <input type="number" min="0" id="sold" name="sold" defaultValue="0" />
+
         <label htmlFor="category"> Type </label>
         <select id="category" name="category" onChange={handleTypeChange}>
           <option value="PrintedBook"> Printed Book </option>
@@ -482,65 +590,6 @@ function Product() {
               id="litForm"
               name="litForm"
               defaultValue="Роман"
-            />
-
-            <label htmlFor="isPublished"> Is Published </label>
-            <input
-              type="checkbox"
-              id="isPublished"
-              name="isPublished"
-              checked="checked"
-            />
-
-            <label htmlFor="publishDate"> Publish Date </label>
-            <input
-              type="date"
-              id="publishDate"
-              name="publishDate"
-              defaultValue="2010-10-10"
-            />
-
-            <label htmlFor="releaseDate"> Release Date </label>
-            <input
-              type="date"
-              id="releaseDate"
-              name="releaseDate"
-              defaultValue="2010-10-10"
-            />
-
-            <label htmlFor="isFeatured"> Is Featured </label>
-            <input
-              type="checkbox"
-              id="isFeatured"
-              name="isFeatured"
-              checked=""
-            />
-
-            <label htmlFor="price"> Price </label>
-            <input
-              type="number"
-              min="0"
-              id="price"
-              name="price"
-              defaultValue="150"
-            />
-
-            <label htmlFor="discount"> Discount </label>
-            <input
-              type="number"
-              min="0"
-              id="discount"
-              name="discount"
-              defaultValue="0"
-            />
-
-            <label htmlFor="sold"> Number Sold </label>
-            <input
-              type="number"
-              min="0"
-              id="sold"
-              name="sold"
-              defaultValue="0"
             />
 
             <label htmlFor="bindings"> Bindings </label>
@@ -678,6 +727,32 @@ function Product() {
               name="ebookFile"
               onChange={handleEBookUpload}
             />
+
+            <label htmlFor="fileVolume"> File Volume, Mb </label>
+            <input
+              type="number"
+              min="0"
+              id="fileVolume"
+              name="fileVolume"
+              defaultValue="0"
+            />
+
+            <label htmlFor="characters"> Characters Number </label>
+            <input
+              type="number"
+              min="0"
+              id="characters"
+              name="characters"
+              defaultValue="10000"
+            />
+
+            <label htmlFor="extra"> Extra Info </label>
+            <input
+              type="text"
+              id="extra"
+              name="extra"
+              defaultValue="Some extra eBook info text"
+            />
           </div>
         )}
 
@@ -710,38 +785,33 @@ export default function AddProductPage() {
     }
   };
 
-  const get_products = async () => {
-    try {
-      const { data: products, error } = await supabase
-        .from("Products")
-        .select(
-          `
-        id,
-        name,
-        category,
-        Audiobooks ( * ),
-        Ebooks ( * ),
-        PrintedBooks ( *,
-          options:PrintOptions ( *,
-            size:PrintSize( * )
-          ),
-          cover:PrintedCover( * )
-        ),
-        Awards ( * )
-        `
-        )
-        .eq("name", params.title);
-      // .eq("name", "Awesome Title");
+  // const get_titles = async () => {
+  //   try {
+  //     const { data: Titles, error } = await supabase.from("Titles").select(
+  //       `
+  //         *,
+  //         Audiobooks ( * ),
+  //         Ebooks ( * ),
+  //         PrintedBooks ( *,
+  //           options:PrintOptions ( *,
+  //             size:PrintSize( * )
+  //           ),
+  //           cover:PrintedCover( * )
+  //         ),
+  //         TitlesAwards ( *,  awards: Awards(*) )
+  //       `
+  //     );
+  //     // .eq("name", params.title);
 
-      if (error) {
-        console.error(error);
-      } else {
-        setProducts(products);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     if (error) {
+  //       console.error(error);
+  //     } else {
+  //       setTitles(titles);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   useEffect(() => {
     get_session();

@@ -11,7 +11,7 @@ function RemoveProduct() {
   const router = useRouter();
 
   async function getProducts() {
-    const { data, error } = await supabase.from("Products").select(
+    const { data, error } = await supabase.from("Titles").select(
       `
         id,
         name,
@@ -35,7 +35,7 @@ function RemoveProduct() {
   async function deleteProduct() {
     const SelectedProductID = document.getElementById("productSelect").value;
     const { error } = await supabase
-      .from("Products")
+      .from("Titles")
       .delete()
       .eq("id", SelectedProductID);
 

@@ -97,7 +97,7 @@ function ProductsAwards() {
   const get_products = async () => {
     try {
       const { data, error } = await supabase
-        .from("Products")
+        .from("Titles")
         .select(`id, name, category, ProductsAwards(*, Awards(*))`)
         .order("id", { ascending: true });
 
@@ -177,7 +177,7 @@ function ManageAwards() {
 
   async function getProdList() {
     const supaProds = await supabase
-      .from("Products")
+      .from("Titles")
       .select(`id, name, category`)
       .order("id", { ascending: true });
 
@@ -276,7 +276,7 @@ function ManageAwards() {
 
   async function getProdNameByID(id) {
     const prodData = await supabase
-      .from("Products")
+      .from("Titles")
       .select("name")
       .eq("id", id)
       .single();

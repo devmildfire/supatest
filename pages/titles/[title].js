@@ -14,7 +14,7 @@ export async function getServerSideProps({ params }) {
 
 export default function ProductPage({ params }) {
   const [session, setSession] = useState(null);
-  const [products, setProducts] = useState(null);
+  const [titles, setTitles] = useState(null);
   const [user, setUser] = useState(null);
 
   const get_session = async () => {
@@ -31,31 +31,22 @@ export default function ProductPage({ params }) {
     }
   };
 
-  const get_products = async () => {
+  const get_titles = async () => {
     try {
-      const { data: products, error } = await supabase
-        .from("Products")
+      const { data: Titles, error } = await supabase
+        .from("Titles")
         .select(
           `
-        id,
-        name,
-        category,
-        price,
-        discount,
-        sold,
-        isFeatured,
-        isPublished,
-        releaseDate,
-        publishDate,
-        Audiobooks ( * ),
-        Ebooks ( * ),
-        PrintedBooks ( *,
-          options:PrintOptions ( *,
-            size:PrintSize( * )
+          name,
+          Audiobooks ( * ),
+          Ebooks ( * ),
+          PrintedBooks ( *,
+            options:PrintOptions ( *,
+              size:PrintSize( * )
+            ),
+            cover:PrintedCover( * )
           ),
-          cover:PrintedCover( * )
-        ),
-        ProductsAwards ( *,  awards: Awards(*) )
+          TitlesAwards ( *,  awards: Awards(*) )
         `
         )
         .eq("name", params.title);
@@ -64,7 +55,7 @@ export default function ProductPage({ params }) {
       if (error) {
         console.error(error);
       } else {
-        setProducts(products);
+        setTitles(Titles);
       }
     } catch (error) {
       console.error(error);
@@ -73,7 +64,7 @@ export default function ProductPage({ params }) {
 
   useEffect(() => {
     get_session();
-    get_products();
+    get_titles();
   }, []);
 
   // console.log(products);
@@ -83,7 +74,7 @@ export default function ProductPage({ params }) {
         <div>
           <p> logged in as {user.email} </p>
           {/* <pre> {JSON.stringify(session, null, 2)} </pre> */}
-          <pre> {products && JSON.stringify(products, null, 2)} </pre>
+          <pre> {titles && JSON.stringify(titles, null, 2)} </pre>
         </div>
       ) : (
         <div> No User Session </div>

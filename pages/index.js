@@ -22,13 +22,13 @@ export default function Home({ Titles }) {
   return (
     <div className={styles.container}>
       <h1>Hello!</h1>
+      <pre> {JSON.stringify(Titles, null, 2)} </pre>
       <div className={styles.container}>
         <Link href="/login">Login</Link>
         <Link href="/awards">Add / Remove Awards</Link>
         <Link href="/add">Add Products</Link>
         <Link href="/deleteProduct">Delete Products</Link>
       </div>
-      <pre> {JSON.stringify(Titles, null, 2)} </pre>
     </div>
   );
 }
