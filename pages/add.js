@@ -1,7 +1,7 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import Nav from "@/components/nav";
 
 function Product() {
@@ -155,21 +155,34 @@ function Product() {
     setAudioFileURL(publicUrl);
   }
 
-  async function setPrintedData(target, productID) {
-    const description = target.description.value;
-    const thesis = target.thesis.value;
+  async function setPrintedData(target, titleID) {
     const pages = target.pages.value;
-    const trailer = VideoFileURL;
+    const extra = target.extra.value;
+    const litForm = target.litForm.value;
+    const isPublished = target.isPublished.value;
+    const isFeatured = target.isFeatured.value;
+    const price = target.price.value;
+    const discount = target.discount.value;
+    const sold = target.sold.value;
+    const publishDate = target.publishDate.value;
+    const releaseDate = target.releaseDate.value;
+
     // const cover = filePath;
 
     const { data, error } = await supabase
       .from("PrintedBooks")
       .insert({
-        description: description,
-        thesis: thesis,
-        trailer: trailer,
         pages: pages,
-        ProductID: productID,
+        title_id: titleID,
+        extra: extra,
+        lit_form: litForm,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
       })
       .select("*")
       .single();
@@ -185,22 +198,24 @@ function Product() {
     return printedBook_ID;
   }
 
-  async function setAudioData(target, productID) {
+  async function setAudioData(target, titleID) {
     const hours = +target.hours.value;
     const minutes = +target.minutes.value;
     const seconds = +target.seconds.value;
 
     const duration = hours * 3600 + minutes * 60 + seconds;
     const extention = target.extention.value;
+    const fileVolume = target.fileVolume.value;
+
     const audioURL = AudioFileURL;
 
     const { data, error } = await supabase
       .from("Audiobooks")
       .insert({
         duration: duration,
-        fileExtention: extention,
         src: audioURL,
-        productID: productID,
+        file_volume: fileVolume,
+        title_id: titleID,
       })
       .select("*")
       .single();
@@ -324,24 +339,25 @@ function Product() {
     event.preventDefault();
 
     const name = event.target.name.value;
-    const category = event.target.category.value;
-    const price = event.target.price.value;
-    const discount = event.target.discount.value;
+    const description = event.target.description.value;
+    const thesis = event.target.thesis.value;
+    const ageRestriction = event.target.ageRestriction.value;
 
     const { data, error } = await supabase
-      .from("Products")
+      .from("Titles")
       .insert({
         name: name,
-        category: category,
-        price: price,
-        discount: discount,
+        description: description,
+        thesis: thesis,
+        trailer: VideoFileURL,
+        age_restriction: ageRestriction,
       })
       .select("*");
 
-    const product_id = await data[0].id;
+    const title_id = await data[0].id;
 
     if (selectedType == "PrintedBook") {
-      const printedBookID = await setPrintedData(event.target, product_id);
+      const printedBookID = await setPrintedData(event.target, title_id);
       console.log("printed Book ID ... ", printedBookID);
 
       const coverID = await setCoverData(fileURL, printedBookID);
@@ -361,18 +377,18 @@ function Product() {
     }
 
     if (selectedType == "AudioBook") {
-      const audioBookID = await setAudioData(event.target, product_id);
+      const audioBookID = await setAudioData(event.target, title_id);
       console.log("AudioBook ID ... ", audioBookID);
     }
 
     if (selectedType == "Ebook") {
-      const eBookID = await setEBookData(event.target, product_id);
+      const eBookID = await setEBookData(event.target, title_id);
       console.log("Ebook ID ... ", eBookID);
     }
 
     console.log("product data ... ", data);
 
-    console.log("product id ... ", product_id);
+    console.log("product id ... ", title_id);
 
     event.target.reset();
 
@@ -395,6 +411,42 @@ function Product() {
           defaultValue="NewProductName"
         />
 
+        <label htmlFor="description"> description </label>
+        <input
+          type="text"
+          min="0"
+          id="description"
+          name="description"
+          defaultValue="some description"
+        />
+
+        <label htmlFor="thesis"> thesis </label>
+        <input
+          type="text"
+          min="0"
+          id="thesis"
+          name="thesis"
+          defaultValue="some thesis"
+        />
+
+        <label htmlFor="trailer"> trailer </label>
+        {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
+        <input
+          type="file"
+          id="trailer"
+          name="trailer"
+          onChange={handleTrailerUpload}
+        />
+
+        <label htmlFor="ageRestriction"> Age Restriction </label>
+        <input
+          type="number"
+          min="0"
+          id="ageRestriction"
+          name="ageRestriction"
+          defaultValue="0"
+        />
+
         <label htmlFor="category"> Type </label>
         <select id="category" name="category" onChange={handleTypeChange}>
           <option value="PrintedBook"> Printed Book </option>
@@ -403,45 +455,9 @@ function Product() {
           <option value="CardBook"> Book 2.0 </option>
         </select>
 
-        <label htmlFor="price"> Price </label>
-        <input
-          type="number"
-          min="0"
-          id="price"
-          name="price"
-          defaultValue="150"
-        />
-
-        <label htmlFor="discount"> Discount </label>
-        <input
-          type="number"
-          min="0"
-          id="discount"
-          name="discount"
-          defaultValue="0"
-        />
-
         {selectedType == "PrintedBook" && (
           <div className={styles.container}>
             <h1> Printed Book options </h1>
-
-            <label htmlFor="description"> description </label>
-            <input
-              type="text"
-              min="0"
-              id="description"
-              name="description"
-              defaultValue="some description"
-            />
-
-            <label htmlFor="thesis"> thesis </label>
-            <input
-              type="text"
-              min="0"
-              id="thesis"
-              name="thesis"
-              defaultValue="some thesis"
-            />
 
             <label htmlFor="pages"> Pages </label>
             <input
@@ -450,6 +466,81 @@ function Product() {
               id="pages"
               name="pages"
               defaultValue="123"
+            />
+
+            <label htmlFor="extra"> Extra Info </label>
+            <input
+              type="text"
+              id="extra"
+              name="extra"
+              defaultValue="Some extra info text"
+            />
+
+            <label htmlFor="litForm"> literature Form </label>
+            <input
+              type="text"
+              id="litForm"
+              name="litForm"
+              defaultValue="Роман"
+            />
+
+            <label htmlFor="isPublished"> Is Published </label>
+            <input
+              type="checkbox"
+              id="isPublished"
+              name="isPublished"
+              checked="checked"
+            />
+
+            <label htmlFor="publishDate"> Publish Date </label>
+            <input
+              type="date"
+              id="publishDate"
+              name="publishDate"
+              defaultValue="2010-10-10"
+            />
+
+            <label htmlFor="releaseDate"> Release Date </label>
+            <input
+              type="date"
+              id="releaseDate"
+              name="releaseDate"
+              defaultValue="2010-10-10"
+            />
+
+            <label htmlFor="isFeatured"> Is Featured </label>
+            <input
+              type="checkbox"
+              id="isFeatured"
+              name="isFeatured"
+              checked=""
+            />
+
+            <label htmlFor="price"> Price </label>
+            <input
+              type="number"
+              min="0"
+              id="price"
+              name="price"
+              defaultValue="150"
+            />
+
+            <label htmlFor="discount"> Discount </label>
+            <input
+              type="number"
+              min="0"
+              id="discount"
+              name="discount"
+              defaultValue="0"
+            />
+
+            <label htmlFor="sold"> Number Sold </label>
+            <input
+              type="number"
+              min="0"
+              id="sold"
+              name="sold"
+              defaultValue="0"
             />
 
             <label htmlFor="bindings"> Bindings </label>
@@ -492,15 +583,6 @@ function Product() {
               id="cover"
               name="cover"
               onChange={handleCoverUpload}
-            />
-
-            <label htmlFor="trailer"> trailer </label>
-            {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
-            <input
-              type="file"
-              id="trailer"
-              name="trailer"
-              onChange={handleTrailerUpload}
             />
           </div>
         )}
@@ -559,6 +641,15 @@ function Product() {
               id="audioFile"
               name="audioFile"
               onChange={handleAudioUpload}
+            />
+
+            <label htmlFor="fileVolume"> File Volume, Mb </label>
+            <input
+              type="number"
+              id="fileVolume"
+              name="fileVolume"
+              defaultValue="0"
+              min="0"
             />
           </div>
         )}

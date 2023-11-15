@@ -3,7 +3,7 @@ import supabase from "../utils/supabase";
 import Link from "next/link";
 
 export async function getStaticProps() {
-  const { data: products, error } = await supabase.from("Products").select("*");
+  const { data: Titles, error } = await supabase.from("Titles").select("*");
 
   // console.log(products);
 
@@ -13,12 +13,12 @@ export async function getStaticProps() {
 
   return {
     props: {
-      products,
+      Titles,
     },
   };
 }
 
-export default function Home({ products }) {
+export default function Home({ Titles }) {
   return (
     <div className={styles.container}>
       <h1>Hello!</h1>
@@ -28,7 +28,7 @@ export default function Home({ products }) {
         <Link href="/add">Add Products</Link>
         <Link href="/deleteProduct">Delete Products</Link>
       </div>
-      <pre> {JSON.stringify(products, null, 2)} </pre>
+      <pre> {JSON.stringify(Titles, null, 2)} </pre>
     </div>
   );
 }
