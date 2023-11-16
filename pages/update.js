@@ -7,6 +7,145 @@ function Update() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [products, setProducts] = useState([]);
 
+  const [selectedType, setSelectedType] = useState("PrintedBook");
+
+  const [filePath, setFilePath] = useState("");
+  const [fileURL, setFileURL] = useState("");
+
+  const [videoFilePath, setVideoFilePath] = useState("");
+  const [VideoFileURL, setVideoFileURL] = useState("");
+
+  const [audioFilePath, setAudioFilePath] = useState("");
+  const [AudioFileURL, setAudioFileURL] = useState("");
+
+  const [eBookFilePath, setEBookFilePath] = useState("");
+  const [eBookFileURL, setEBookFileURL] = useState("");
+
+  async function handleTrailerUpload(event) {
+    event.preventDefault();
+
+    const videoFile = event.target.files[0];
+
+    console.log(videoFile);
+
+    const { data, error } = await supabase.storage
+      .from("trailers")
+      .upload(`public/file_${videoFile.name}`, videoFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setVideoFilePath(data.path);
+    console.log("video file path ...", data.path);
+
+    console.log("video file return info ...", JSON.stringify(data, null, 2));
+    console.log("video file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("trailers")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setVideoFileURL(publicUrl);
+  }
+
+  async function handleCoverUpload(event) {
+    event.preventDefault();
+    // setFile(event.target.files[0]);
+    const file = event.target.files[0];
+
+    // console.log("setting file");
+    console.log(file);
+
+    const { data, error } = await supabase.storage
+      .from("covers")
+      .upload(`public/file_${file.name}`, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setFilePath(data.path);
+    console.log("file path ...", data.path);
+
+    console.log("file return info ...", JSON.stringify(data, null, 2));
+    console.log("file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("covers")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setFileURL(publicUrl);
+  }
+
+  async function handleEBookUpload(event) {
+    event.preventDefault();
+
+    const eBookFile = event.target.files[0];
+
+    console.log(eBookFile);
+
+    const { data, error } = await supabase.storage
+      .from("eBooks")
+      .upload(`/file_${eBookFile.name}`, eBookFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setEBookFilePath(data.path);
+    console.log("eBook file path ...", data.path);
+
+    console.log("eBook file return info ...", JSON.stringify(data, null, 2));
+    console.log("eBook file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("eBooks")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setEBookFileURL(publicUrl);
+  }
+
+  async function handleAudioUpload(event) {
+    event.preventDefault();
+
+    const audioFile = event.target.files[0];
+
+    console.log(audioFile);
+
+    const { data, error } = await supabase.storage
+      .from("audiobooks")
+      .upload(`/file_${audioFile.name}`, audioFile, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    data && setAudioFilePath(data.path);
+    console.log("audio file path ...", data.path);
+
+    console.log("audio file return info ...", JSON.stringify(data, null, 2));
+    console.log("audio file return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("audiobooks")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setAudioFileURL(publicUrl);
+  }
+
   async function getProducts() {
     const { data, error } = await supabase.from("Titles").select(
       `
@@ -30,8 +169,40 @@ function Update() {
     error && console.error(JSON.stringify(error, null, 2));
   }
 
-  async function getProductByTableAndID(table, id) {
-    const { data, error } = await supabase.from(table).select().eq("id", id);
+  async function getProductByTableAndID(titleID, table, id) {
+    // const { data, error } = await supabase.from(table).select().eq("id", id);
+
+    const printedBookQueryString = `
+        *,
+        CardBooks ( * ),
+        Audiobooks ( * ),
+        Ebooks ( * ),
+        PrintedBooks ( *,
+          options:PrintOptions ( *,
+            size:PrintSize( * )
+          ),
+        cover:PrintedCover( * )
+        ),
+        TitlesAwards ( *,  awards: Awards(*) )
+      `;
+
+    const usualQueryString = `
+        *,
+        CardBooks ( * ),
+        Audiobooks ( * ),
+        Ebooks ( * ),
+        TitlesAwards ( *,  awards: Awards(*) )
+      `;
+
+    const queryString =
+      table == "PrintedBooks" ? printedBookQueryString : usualQueryString;
+
+    setSelectedType(table);
+
+    const { data, error } = await supabase
+      .from("Titles")
+      .select(queryString)
+      .eq("id", titleID);
 
     data && setSelectedProduct(data);
     data && console.log("selected product ... ", JSON.stringify(data, null, 2));
@@ -46,10 +217,11 @@ function Update() {
 
     const id = SelectedProductObject.id;
     const table = SelectedProductObject.type;
+    const titleID = SelectedProductObject.title;
 
     console.log("selected object ... ", SelectedProductObject);
 
-    getProductByTableAndID(table, id);
+    getProductByTableAndID(titleID, table, id);
   }
 
   useEffect(() => {
@@ -61,25 +233,29 @@ function Update() {
       <h1> Update Product </h1>
 
       <select onChange={changeProduct} id="productSelect">
-        <option disabled selected value="false">
+        <option key={"select Product"} disabled selected value="false">
           -- select Product --
         </option>
 
         {products.map((title) => {
           const optionValues = [
             {
+              title: title.id,
               type: "Audiobooks",
               id: title.Audiobooks ? title.Audiobooks.id : 0,
             },
             {
+              title: title.id,
               type: "Ebooks",
               id: title.Ebooks ? title.Ebooks.id : 0,
             },
             {
+              title: title.id,
               type: "PrintedBooks",
               id: title.PrintedBooks ? title.PrintedBooks.id : 0,
             },
             {
+              title: title.id,
               type: "CardBooks",
               id: title.CardBooks ? title.CardBooks.id : 0,
             },
@@ -93,18 +269,24 @@ function Update() {
           return (
             <>
               {title.Audiobooks && (
-                <option value={audioString}>{title.name} - Audiobok</option>
+                <option key={audioString} value={audioString}>
+                  {title.name} - Audiobok
+                </option>
               )}
               {title.Ebooks && (
-                <option value={ebooktring}>{title.name} - eBook</option>
+                <option key={ebooktring} value={ebooktring}>
+                  {title.name} - eBook
+                </option>
               )}
               {title.PrintedBooks && (
-                <option value={printedString}>
+                <option key={printedString} value={printedString}>
                   {title.name} - printed book
                 </option>
               )}
               {title.CardBooks && (
-                <option value={cardString}>{title.name} - book 2.0</option>
+                <option key={cardString} value={cardString}>
+                  {title.name} - book 2.0
+                </option>
               )}
             </>
           );
@@ -114,6 +296,336 @@ function Update() {
       <div className={styles.container}>
         <pre> {JSON.stringify(selectedProduct, null, 2)}</pre>
       </div>
+
+      {selectedProduct && (
+        <form
+          // onSubmit={handleSubmit}
+          className={styles.form}
+        >
+          <label htmlFor="name"> Name </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            // defaultValue={selectedProduct.name}
+            defaultValue="somename"
+          />
+
+          <label htmlFor="description"> description </label>
+          <input
+            type="text"
+            min="0"
+            id="description"
+            name="description"
+            defaultValue="some description"
+          />
+
+          <label htmlFor="thesis"> thesis </label>
+          <input
+            type="text"
+            min="0"
+            id="thesis"
+            name="thesis"
+            defaultValue="some thesis"
+          />
+
+          <label htmlFor="trailer"> trailer </label>
+          {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
+          <input
+            type="file"
+            id="trailer"
+            name="trailer"
+            onChange={handleTrailerUpload}
+          />
+
+          <label htmlFor="ageRestriction"> Age Restriction </label>
+          <input
+            type="number"
+            min="0"
+            id="ageRestriction"
+            name="ageRestriction"
+            defaultValue="0"
+          />
+
+          <label htmlFor="isPublished"> Is Published </label>
+          <input
+            type="checkbox"
+            id="isPublished"
+            name="isPublished"
+            defaultChecked="checked"
+          />
+
+          <label htmlFor="publishDate"> Publish Date </label>
+          <input
+            type="date"
+            id="publishDate"
+            name="publishDate"
+            defaultValue="2010-10-10"
+          />
+
+          <label htmlFor="releaseDate"> Release Date </label>
+          <input
+            type="date"
+            id="releaseDate"
+            name="releaseDate"
+            defaultValue="2010-10-10"
+          />
+
+          <label htmlFor="isFeatured"> Is Featured </label>
+          <input
+            type="checkbox"
+            id="isFeatured"
+            name="isFeatured"
+            defaultChecked=""
+          />
+
+          <label htmlFor="price"> Price </label>
+          <input
+            type="number"
+            min="0"
+            id="price"
+            name="price"
+            defaultValue="150"
+          />
+
+          <label htmlFor="discount"> Discount </label>
+          <input
+            type="number"
+            min="0"
+            id="discount"
+            name="discount"
+            defaultValue="0"
+          />
+
+          <label htmlFor="sold"> Number Sold </label>
+          <input type="number" min="0" id="sold" name="sold" defaultValue="0" />
+
+          {selectedType == "PrintedBooks" && (
+            <div className={styles.container}>
+              <h1> Printed Book options </h1>
+
+              <label htmlFor="pages"> Pages </label>
+              <input
+                type="number"
+                min="0"
+                id="pages"
+                name="pages"
+                defaultValue="123"
+              />
+
+              <label htmlFor="extra"> Extra Info </label>
+              <input
+                type="text"
+                id="extra"
+                name="extra"
+                defaultValue="Some extra info text"
+              />
+
+              <label htmlFor="litForm"> literature Form </label>
+              <input
+                type="text"
+                id="litForm"
+                name="litForm"
+                defaultValue="Роман"
+              />
+
+              <label htmlFor="bindings"> Bindings </label>
+              <input
+                type="text"
+                id="bindings"
+                name="bindings"
+                defaultValue="HardCore!"
+              />
+
+              <label htmlFor="coverType"> CoverType </label>
+              <input
+                type="text"
+                id="coverType"
+                name="coverType"
+                defaultValue="DisCover!"
+              />
+
+              <label htmlFor="paper"> Paper </label>
+              <input
+                type="text"
+                id="paper"
+                name="paper"
+                defaultValue="TwoPly"
+              />
+
+              <label htmlFor="illustrations"> Illustrations </label>
+              <input
+                type="text"
+                id="illustrations"
+                name="illustrations"
+                defaultValue="Dazzling!"
+              />
+
+              <label htmlFor="width"> Width </label>
+              <input type="number" id="width" name="width" defaultValue="42" />
+
+              <label htmlFor="height"> Height </label>
+              <input
+                type="number"
+                id="height"
+                name="height"
+                defaultValue="42"
+              />
+
+              <label htmlFor="cover"> Cover </label>
+              {filePath && <img src={fileURL} alt={filePath} />}
+              <input
+                type="file"
+                id="cover"
+                name="cover"
+                onChange={handleCoverUpload}
+              />
+            </div>
+          )}
+
+          {selectedType == "Audiobooks" && (
+            <div className={styles.container}>
+              <h1> Audio Book options </h1>
+
+              <div className={styles.container}>
+                <h1> Duration </h1>
+                <label htmlFor="hours"> Hours </label>
+                <input
+                  type="number"
+                  id="hours"
+                  name="hours"
+                  defaultValue="0"
+                  min="0"
+                />
+
+                <label htmlFor="minutes"> Minutes </label>
+                <input
+                  type="number"
+                  id="minutes"
+                  name="minutes"
+                  defaultValue="0"
+                  min="0"
+                  max="59"
+                />
+
+                <label htmlFor="seconds"> Seconds </label>
+                <input
+                  type="number"
+                  id="seconds"
+                  name="seconds"
+                  defaultValue="0"
+                  min="0"
+                  max="59"
+                />
+              </div>
+
+              <label htmlFor="extention">File Extention </label>
+              <select id="extention" name="extention">
+                <option value="MP3"> MP3 </option>
+                <option value="AAC"> AAC </option>
+                <option value="AAX"> AAX </option>
+                <option value="M4A"> M4A </option>
+                <option value="M4B"> M4B </option>
+                <option value="OGG"> OGG </option>
+                <option value="WMA"> WMA </option>
+              </select>
+
+              <label htmlFor="audioFile"> Audio File </label>
+              {audioFilePath && (
+                <audio src={AudioFileURL} alt={audioFilePath} />
+              )}
+              <input
+                type="file"
+                id="audioFile"
+                name="audioFile"
+                onChange={handleAudioUpload}
+              />
+
+              <label htmlFor="fileVolume"> File Volume, Mb </label>
+              <input
+                type="number"
+                id="fileVolume"
+                name="fileVolume"
+                defaultValue="0"
+                min="0"
+              />
+            </div>
+          )}
+
+          {selectedType == "Ebooks" && (
+            <div className={styles.container}>
+              <h1> E-Book options </h1>
+
+              <label htmlFor="eBookExtention">E-Book File Extention </label>
+              <select id="eBookExtention" name="eBookExtention">
+                <option value="epub"> epub </option>
+                <option value="fb2"> fb2 </option>
+                <option value="cbr"> cbr </option>
+                <option value="opf"> opf </option>
+                <option value="mobi"> mobi </option>
+                <option value="orb"> orb </option>
+                <option value="ibooks"> ibooks </option>
+                <option value="edt"> edt </option>
+              </select>
+
+              <label htmlFor="ebookFile"> eBook File </label>
+              {audioFilePath && (
+                <audio src={AudioFileURL} alt={audioFilePath} />
+              )}
+              <input
+                type="file"
+                id="ebookFile"
+                name="ebookFile"
+                onChange={handleEBookUpload}
+              />
+
+              <label htmlFor="fileVolume"> File Volume, Mb </label>
+              <input
+                type="number"
+                min="0"
+                id="fileVolume"
+                name="fileVolume"
+                defaultValue="0"
+              />
+
+              <label htmlFor="characters"> Characters Number </label>
+              <input
+                type="number"
+                min="0"
+                id="characters"
+                name="characters"
+                defaultValue="10000"
+              />
+
+              <label htmlFor="extra"> Extra Info </label>
+              <input
+                type="text"
+                id="extra"
+                name="extra"
+                defaultValue="Some extra eBook info text"
+              />
+            </div>
+          )}
+
+          {selectedType == "CardBooks" && (
+            <div className={styles.container}>
+              <h1> Book2.0 options </h1>
+
+              <label htmlFor="extra"> Extra Info </label>
+              <input
+                type="text"
+                id="extra"
+                name="extra"
+                defaultValue="Some extra eBook info text"
+              />
+            </div>
+          )}
+
+          <button type="submit" className={styles.button}>
+            Update Product
+          </button>
+        </form>
+      )}
     </div>
   );
 }
