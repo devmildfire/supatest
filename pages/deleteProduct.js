@@ -10,7 +10,14 @@ function RemoveProduct() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const router = useRouter();
 
+  async function getCardBooks() {
+    const { data, error } = await supabase.from("CardBooks").select();
+
+    console.log("all CardBooks data", JSON.stringify(data, null, 2));
+  }
+
   async function getProducts() {
+    getCardBooks();
     const { data, error } = await supabase.from("Titles").select(
       `
         *,
@@ -22,11 +29,14 @@ function RemoveProduct() {
           ),
           cover:PrintedCover( * )
         ),
+        CardBooks ( * ),
         TitlesAwards ( *, awards: Awards(*) )
-        `
+      `
     );
 
-    data && (setProducts(data), console.log(JSON.stringify(data, null, 2)));
+    data &&
+      (setProducts(data),
+      console.log("all products data", JSON.stringify(data, null, 2)));
     error && console.log(JSON.stringify(error, null, 2));
   }
 
@@ -84,11 +94,16 @@ function RemoveProduct() {
               type: "PrintedBooks",
               id: title.PrintedBooks ? title.PrintedBooks.id : 0,
             },
+            {
+              type: "CardBooks",
+              id: title.CardBooks ? title.CardBooks.id : 0,
+            },
           ];
 
           const audioString = JSON.stringify(optionValues[0]);
           const ebooktring = JSON.stringify(optionValues[1]);
           const printedString = JSON.stringify(optionValues[2]);
+          const cardString = JSON.stringify(optionValues[3]);
 
           return (
             <>
@@ -102,6 +117,9 @@ function RemoveProduct() {
                 <option value={printedString}>
                   {title.name} - printed book
                 </option>
+              )}
+              {title.CardBooks && (
+                <option value={cardString}>{title.name} - book 2.0</option>
               )}
             </>
           );
@@ -119,8 +137,7 @@ function RemoveProduct() {
             deleteProduct(selectedProduct);
           }}
         >
-          {" "}
-          Delete Product{" "}
+          Delete Product
         </button>
       )}
     </div>

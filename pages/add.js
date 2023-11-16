@@ -275,6 +275,43 @@ function Product() {
     return eBook_ID;
   }
 
+  async function setCardBookData(target, titleID) {
+    const extra = target.extra.value;
+    const isPublished = target.isPublished.value;
+    const isFeatured = target.isFeatured.value;
+    const price = target.price.value;
+    const discount = target.discount.value;
+    const sold = target.sold.value;
+    const publishDate = target.publishDate.value;
+    const releaseDate = target.releaseDate.value;
+
+    const { data, error } = await supabase
+      .from("CardBooks")
+      .insert({
+        title_id: titleID,
+        extra: extra,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
+      })
+      .select()
+      .single();
+
+    console.log("cardBook data ... ", data);
+    console.log("cardBook data ... ", JSON.stringify(data, null, 2));
+    console.log("cardBook error ... ", error);
+
+    const cardBook_ID = data ? data.id : "no ID for me";
+
+    console.log("cardBook ID ... ", cardBook_ID);
+
+    return cardBook_ID;
+  }
+
   async function setCoverData(coverUrl, printedBookID) {
     // const cover = filePath;
 
@@ -439,6 +476,11 @@ function Product() {
       eBookID == "no ID for me" && (submitSucessfull = false);
     }
 
+    if (selectedType == "CardBook") {
+      const cardBookID = await setCardBookData(event.target, title_id);
+      console.log("CardBook ID ... ", cardBookID);
+      cardBookID == "no ID for me" && (submitSucessfull = false);
+    }
     // data && console.log("product data ... ", data);
 
     console.log("product id ... ", title_id);
@@ -745,6 +787,20 @@ function Product() {
               name="characters"
               defaultValue="10000"
             />
+
+            <label htmlFor="extra"> Extra Info </label>
+            <input
+              type="text"
+              id="extra"
+              name="extra"
+              defaultValue="Some extra eBook info text"
+            />
+          </div>
+        )}
+
+        {selectedType == "CardBook" && (
+          <div className={styles.container}>
+            <h1> Book2.0 options </h1>
 
             <label htmlFor="extra"> Extra Info </label>
             <input

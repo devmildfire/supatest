@@ -3,7 +3,9 @@ import supabase from "../utils/supabase";
 import Link from "next/link";
 
 export async function getStaticProps() {
-  const { data: Titles, error } = await supabase.from("Titles").select("*");
+  const { data: Titles, error } = await supabase
+    .from("Titles")
+    .select("*, PrintedBooks(*), Audiobooks(*), Ebooks(*), CardBooks(*)");
 
   // console.log(products);
 

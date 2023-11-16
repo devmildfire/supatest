@@ -4,21 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import Nav from "@/components/nav";
 
-// `
-// id,
-// name,
-
-// Audiobooks ( * ),
-// Ebooks ( * ),
-// PrintedBooks ( *,
-//   options:PrintOptions ( *,
-//     size:PrintSize( * )
-//   ),
-//   cover:PrintedCover( * )
-// ),
-// TitlesAwards ( *,  awards: Awards(*) )
-// `
-
 export default function AllProductsPage() {
   const [session, setSession] = useState(null);
   const [titles, setTitles] = useState(null);
@@ -44,6 +29,7 @@ export default function AllProductsPage() {
       let { data: Titles, error } = await supabase.from("Titles").select(
         `
           *,
+          CardBooks ( * ),
           Audiobooks ( * ),
           Ebooks ( * ),
           PrintedBooks ( *,
