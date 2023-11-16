@@ -2,7 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
+// import Link from "next/link";
 import Nav from "@/components/nav";
 
 function RemoveProduct() {
@@ -13,9 +13,7 @@ function RemoveProduct() {
   async function getProducts() {
     const { data, error } = await supabase.from("Titles").select(
       `
-        id,
-        name,
-        category,
+        *,
         Audiobooks ( * ),
         Ebooks ( * ),
         PrintedBooks ( *,
@@ -24,7 +22,7 @@ function RemoveProduct() {
           ),
           cover:PrintedCover( * )
         ),
-        ProductsAwards ( *, awards: Awards(*) )
+        TitlesAwards ( *, awards: Awards(*) )
         `
     );
 
@@ -32,30 +30,35 @@ function RemoveProduct() {
     error && console.log(JSON.stringify(error, null, 2));
   }
 
-  async function deleteProduct() {
-    const SelectedProductID = document.getElementById("productSelect").value;
+  async function deleteProduct(selProdObj) {
+    const SelectedProductID = +selProdObj.id;
+    const SelectedProductTable = selProdObj.type;
+
     const { error } = await supabase
-      .from("Titles")
+      .from(SelectedProductTable)
       .delete()
       .eq("id", SelectedProductID);
 
     error && console.log(JSON.stringify(error, null, 2));
-    !error && alert(`Product with ID ${SelectedProductID} DELETED`);
+    !error &&
+      alert(
+        `Product from ${SelectedProductTable} with ID ${SelectedProductID} DELETED`
+      );
 
     router.reload();
   }
 
   function changeProduct() {
-    const SelectedProductID = document.getElementById("productSelect").value;
-    console.log(SelectedProductID);
-    setSelectedProduct(products.find((o) => o.id == SelectedProductID));
-    console.log(selectedProduct);
+    const SelectedProductObject = JSON.parse(
+      document.getElementById("productSelect").value
+    );
+
+    console.log("selected object ... ", SelectedProductObject);
+    setSelectedProduct(SelectedProductObject);
   }
 
   useEffect(() => {
     getProducts();
-    // changeProduct();
-    // console.log(JSON.stringify(products, null, 2));
   }, []);
 
   return (
@@ -66,11 +69,43 @@ function RemoveProduct() {
         <option disabled selected value="false">
           -- select Product --
         </option>
-        {products.map((product) => (
-          <option key={product.id} value={product.id}>
-            {product.id} - {product.name} - {product.category}
-          </option>
-        ))}
+
+        {products.map((title) => {
+          const optionValues = [
+            {
+              type: "Audiobooks",
+              id: title.Audiobooks ? title.Audiobooks.id : 0,
+            },
+            {
+              type: "Ebooks",
+              id: title.Ebooks ? title.Ebooks.id : 0,
+            },
+            {
+              type: "PrintedBooks",
+              id: title.PrintedBooks ? title.PrintedBooks.id : 0,
+            },
+          ];
+
+          const audioString = JSON.stringify(optionValues[0]);
+          const ebooktring = JSON.stringify(optionValues[1]);
+          const printedString = JSON.stringify(optionValues[2]);
+
+          return (
+            <>
+              {title.Audiobooks && (
+                <option value={audioString}>{title.name} - Audiobok</option>
+              )}
+              {title.Ebooks && (
+                <option value={ebooktring}>{title.name} - eBook</option>
+              )}
+              {title.PrintedBooks && (
+                <option value={printedString}>
+                  {title.name} - printed book
+                </option>
+              )}
+            </>
+          );
+        })}
       </select>
 
       <div className={styles.container}>
@@ -78,7 +113,12 @@ function RemoveProduct() {
       </div>
 
       {selectedProduct && (
-        <button className={styles.button} onClick={deleteProduct}>
+        <button
+          className={styles.button}
+          onClick={() => {
+            deleteProduct(selectedProduct);
+          }}
+        >
           {" "}
           Delete Product{" "}
         </button>

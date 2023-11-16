@@ -2,7 +2,7 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
+// import Link from "next/link";
 import Nav from "@/components/nav";
 
 function Award() {
@@ -98,7 +98,7 @@ function ProductsAwards() {
     try {
       const { data, error } = await supabase
         .from("Titles")
-        .select(`id, name, category, ProductsAwards(*, Awards(*))`)
+        .select(`id, name, TitlesAwards(*, Awards(*))`)
         .order("id", { ascending: true });
 
       if (error) {
@@ -129,17 +129,17 @@ function ProductsAwards() {
 
       {productsList.map((item) => {
         return (
-          item.ProductsAwards.length > 0 && (
+          item.TitlesAwards.length > 0 && (
             <div key={item.id}>
               <p className={styles.awardsContainer}>
-                {item.id} - {item.name} - {item.category}
+                {item.id} - {item.name}
               </p>
 
               <div className={styles.awardsContainer}>
-                {item.ProductsAwards.map((productAward) => {
+                {item.TitlesAwards.map((titleAward) => {
                   return (
-                    <div key={productAward.AwardID} className={styles.award}>
-                      {productAward.Awards.title}
+                    <div key={titleAward.award_id} className={styles.award}>
+                      {titleAward.Awards.title}
                     </div>
                   );
                 })}
@@ -178,7 +178,7 @@ function ManageAwards() {
   async function getProdList() {
     const supaProds = await supabase
       .from("Titles")
-      .select(`id, name, category`)
+      .select(`id, name`)
       .order("id", { ascending: true });
 
     supaProds.error && console.error(supaProds.error);
@@ -200,7 +200,7 @@ function ManageAwards() {
   }
 
   async function getProdAwardList() {
-    const supaProdAwards = await supabase.from("ProductsAwards").select();
+    const supaProdAwards = await supabase.from("TitlesAwards").select();
 
     supaProdAwards.error && console.error(supaProdAwards.error);
     supaProdAwards.data &&
@@ -240,8 +240,8 @@ function ManageAwards() {
     let isLegal = true;
 
     productsAwardsList.map((prodAward) => {
-      prodAward.ProductID == prod &&
-        prodAward.AwardID == aw &&
+      prodAward.title_id == prod &&
+        prodAward.award_id == aw &&
         (isLegal = false);
     });
 
@@ -251,14 +251,14 @@ function ManageAwards() {
 
   async function addAward(event) {
     event.preventDefault();
-    const supaAwardData = await supabase.from("ProductsAwards").select();
+    const supaAwardData = await supabase.from("TitlesAwards").select();
 
     supaAwardData.error && console.error(supaAwardData.error);
     supaAwardData.data && console.log(JSON.stringify(supaAwardData, null, 2));
 
     const { data, error } = await supabase
-      .from("ProductsAwards")
-      .insert({ ProductID: product, AwardID: award })
+      .from("TitlesAwards")
+      .insert({ title_id: product, award_id: award })
       .select();
 
     console.log("insert error ... ", JSON.stringify(error, null, 2));
@@ -283,7 +283,7 @@ function ManageAwards() {
 
     let prodName;
 
-    prodData.error && console.error("could not retrieve name");
+    prodData.error && console.error("could not retrieve title name");
     prodData.data && (prodName = prodData.data.name);
 
     return prodName;
@@ -298,7 +298,7 @@ function ManageAwards() {
 
     let awardName;
 
-    awardData.error && console.error("could not retrieve name");
+    awardData.error && console.error("could not retrieve award name");
     awardData.data && (awardName = awardData.data.title);
 
     return awardName;
@@ -306,16 +306,16 @@ function ManageAwards() {
 
   async function removeAward(event) {
     event.preventDefault();
-    const supaAwardData = await supabase.from("ProductsAwards").select();
+    const supaAwardData = await supabase.from("TitlesAwards").select();
 
     supaAwardData.error && console.error(supaAwardData.error);
     supaAwardData.data && console.log(JSON.stringify(supaAwardData, null, 2));
 
     const { error } = await supabase
-      .from("ProductsAwards")
+      .from("TitlesAwards")
       .delete()
-      .eq("ProductID", product)
-      .eq("AwardID", award);
+      .eq("title_id", product)
+      .eq("award_id", award);
 
     console.log("delete error ... ", JSON.stringify(error, null, 2));
 
