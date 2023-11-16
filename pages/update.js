@@ -1,8 +1,122 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
-// import Link from "next/link";
 import Nav from "@/components/nav";
+
+function Update() {
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+
+  async function getProducts() {
+    const { data, error } = await supabase.from("Titles").select(
+      `
+        *,
+        Audiobooks ( * ),
+        Ebooks ( * ),
+        PrintedBooks ( *,
+          options:PrintOptions ( *,
+            size:PrintSize( * )
+          ),
+          cover:PrintedCover( * )
+        ),
+        CardBooks ( * ),
+        TitlesAwards ( *, awards: Awards(*) )
+      `
+    );
+
+    data &&
+      (setProducts(data),
+      console.log("all products data", JSON.stringify(data, null, 2)));
+    error && console.error(JSON.stringify(error, null, 2));
+  }
+
+  async function getProductByTableAndID(table, id) {
+    const { data, error } = await supabase.from(table).select().eq("id", id);
+
+    data && setSelectedProduct(data);
+    data && console.log("selected product ... ", JSON.stringify(data, null, 2));
+
+    error && console.log(JSON.stringify(error, null, 2));
+  }
+
+  function changeProduct() {
+    const SelectedProductObject = JSON.parse(
+      document.getElementById("productSelect").value
+    );
+
+    const id = SelectedProductObject.id;
+    const table = SelectedProductObject.type;
+
+    console.log("selected object ... ", SelectedProductObject);
+
+    getProductByTableAndID(table, id);
+  }
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  return (
+    <div className={styles.container}>
+      <h1> Update Product </h1>
+
+      <select onChange={changeProduct} id="productSelect">
+        <option disabled selected value="false">
+          -- select Product --
+        </option>
+
+        {products.map((title) => {
+          const optionValues = [
+            {
+              type: "Audiobooks",
+              id: title.Audiobooks ? title.Audiobooks.id : 0,
+            },
+            {
+              type: "Ebooks",
+              id: title.Ebooks ? title.Ebooks.id : 0,
+            },
+            {
+              type: "PrintedBooks",
+              id: title.PrintedBooks ? title.PrintedBooks.id : 0,
+            },
+            {
+              type: "CardBooks",
+              id: title.CardBooks ? title.CardBooks.id : 0,
+            },
+          ];
+
+          const audioString = JSON.stringify(optionValues[0]);
+          const ebooktring = JSON.stringify(optionValues[1]);
+          const printedString = JSON.stringify(optionValues[2]);
+          const cardString = JSON.stringify(optionValues[3]);
+
+          return (
+            <>
+              {title.Audiobooks && (
+                <option value={audioString}>{title.name} - Audiobok</option>
+              )}
+              {title.Ebooks && (
+                <option value={ebooktring}>{title.name} - eBook</option>
+              )}
+              {title.PrintedBooks && (
+                <option value={printedString}>
+                  {title.name} - printed book
+                </option>
+              )}
+              {title.CardBooks && (
+                <option value={cardString}>{title.name} - book 2.0</option>
+              )}
+            </>
+          );
+        })}
+      </select>
+
+      <div className={styles.container}>
+        <pre> {JSON.stringify(selectedProduct, null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
 
 function Product() {
   const [selectedType, setSelectedType] = useState("PrintedBook");
@@ -822,7 +936,7 @@ function Product() {
   );
 }
 
-export default function AddProductPage() {
+export default function UpdateProductPage() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -849,7 +963,7 @@ export default function AddProductPage() {
       {session ? (
         <div>
           <p> logged in as {user.email} </p>
-          <Product />
+          <Update />
         </div>
       ) : (
         <div> No User Session </div>

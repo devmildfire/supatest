@@ -10,14 +10,7 @@ function RemoveProduct() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const router = useRouter();
 
-  async function getCardBooks() {
-    const { data, error } = await supabase.from("CardBooks").select();
-
-    console.log("all CardBooks data", JSON.stringify(data, null, 2));
-  }
-
   async function getProducts() {
-    getCardBooks();
     const { data, error } = await supabase.from("Titles").select(
       `
         *,
