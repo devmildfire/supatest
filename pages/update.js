@@ -21,6 +21,10 @@ function Update() {
   const [eBookFilePath, setEBookFilePath] = useState("");
   const [eBookFileURL, setEBookFileURL] = useState("");
 
+  const [name, setName] = useState("");
+
+  let trailerFile;
+
   async function handleTrailerUpload(event) {
     event.preventDefault();
 
@@ -54,10 +58,8 @@ function Update() {
 
   async function handleCoverUpload(event) {
     event.preventDefault();
-    // setFile(event.target.files[0]);
     const file = event.target.files[0];
 
-    // console.log("setting file");
     console.log(file);
 
     const { data, error } = await supabase.storage
@@ -169,6 +171,15 @@ function Update() {
     error && console.error(JSON.stringify(error, null, 2));
   }
 
+  async function getFiles(url) {
+    let trailerFile = await fetch(url)
+      .then((r) => r.blob())
+      .then(
+        (blobFile) => new File([blobFile], "trailerFile", { type: "video/3gp" })
+      );
+    return trailerFile;
+  }
+
   async function getProductByTableAndID(titleID, table, id) {
     // const { data, error } = await supabase.from(table).select().eq("id", id);
 
@@ -201,13 +212,35 @@ function Update() {
 
     const { data, error } = await supabase
       .from("Titles")
-      .select(queryString)
-      .eq("id", titleID);
+      .select(
+        `
+        *,
+        CardBooks ( * ),
+        Audiobooks ( * ),
+        Ebooks ( * ),
+        PrintedBooks ( *,
+          options:PrintOptions ( *,
+            size:PrintSize( * )
+          ),
+        cover:PrintedCover( * )
+        ),
+        TitlesAwards ( *,  awards: Awards(*) )
+      `
+      )
+      .eq("id", titleID)
+      .single();
 
     data && setSelectedProduct(data);
+    data && setName(data.name);
+
     data && console.log("selected product ... ", JSON.stringify(data, null, 2));
 
     error && console.log(JSON.stringify(error, null, 2));
+
+    if (!error) {
+      trailerFile = await getFiles(data.traier);
+      console.log("Trailer File", trailerFile);
+    }
   }
 
   function changeProduct() {
@@ -297,6 +330,8 @@ function Update() {
         <pre> {JSON.stringify(selectedProduct, null, 2)}</pre>
       </div>
 
+      <p> selected product {selectedProduct && selectedProduct.name}</p>
+
       {selectedProduct && (
         <form
           // onSubmit={handleSubmit}
@@ -307,30 +342,52 @@ function Update() {
             type="text"
             id="name"
             name="name"
-            // defaultValue={selectedProduct.name}
-            defaultValue="somename"
+            value={selectedProduct.name || ""}
+            onChange={(e) => {
+              setSelectedProduct({ ...selectedProduct, name: e.target.value });
+            }}
           />
 
           <label htmlFor="description"> description </label>
-          <input
+          <textarea
             type="text"
-            min="0"
+            rows="4"
+            cols="50"
             id="description"
             name="description"
-            defaultValue="some description"
-          />
+            value={selectedProduct.description || ""}
+            onChange={(e) => {
+              setSelectedProduct({
+                ...selectedProduct,
+                description: e.target.value,
+              });
+            }}
+          ></textarea>
 
           <label htmlFor="thesis"> thesis </label>
-          <input
+          <textarea
             type="text"
-            min="0"
+            rows="4"
+            cols="50"
             id="thesis"
             name="thesis"
-            defaultValue="some thesis"
-          />
+            value={selectedProduct.thesis || ""}
+            onChange={(e) => {
+              setSelectedProduct({
+                ...selectedProduct,
+                thesis: e.target.value,
+              });
+            }}
+          ></textarea>
 
           <label htmlFor="trailer"> trailer </label>
-          {videoFilePath && <video src={VideoFileURL} alt={videoFilePath} />}
+          <p>{selectedProduct.trailer}</p>
+          {selectedProduct && (
+            <video
+              src={selectedProduct.trailer}
+              alt={selectedProduct.trailer}
+            />
+          )}
           <input
             type="file"
             id="trailer"
