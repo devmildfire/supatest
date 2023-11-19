@@ -54,6 +54,7 @@ function Update() {
     console.log(`${publicUrl} returned`);
 
     setVideoFileURL(publicUrl);
+    setSelectedProduct({ ...selectedProduct, trailer: publicUrl });
   }
 
   async function handleCoverUpload(event) {
@@ -401,7 +402,13 @@ function Update() {
             min="0"
             id="ageRestriction"
             name="ageRestriction"
-            defaultValue="0"
+            value={selectedProduct.age_restriction || ""}
+            onChange={(e) => {
+              setSelectedProduct({
+                ...selectedProduct,
+                age_restriction: e.target.value,
+              });
+            }}
           />
 
           <label htmlFor="isPublished"> Is Published </label>
@@ -838,23 +845,23 @@ function Product() {
     setAudioFileURL(publicUrl);
   }
 
-  async function setPrintedData(target, titleID) {
-    const pages = target.pages.value;
-    const extra = target.extra.value;
-    const litForm = target.litForm.value;
-    const isPublished = target.isPublished.value;
-    const isFeatured = target.isFeatured.value;
-    const price = target.price.value;
-    const discount = target.discount.value;
-    const sold = target.sold.value;
-    const publishDate = target.publishDate.value;
-    const releaseDate = target.releaseDate.value;
-
-    // const cover = filePath;
+  async function setPrintedData() {
+    const pages = selectedProduct.PrintedBooks.pages;
+    const extra = selectedProduct.PrintedBooks.extra;
+    const litForm = selectedProduct.PrintedBooks.litForm;
+    const isPublished = selectedProduct.PrintedBooks.isPublished;
+    const isFeatured = selectedProduct.PrintedBooks.isFeatured;
+    const price = selectedProduct.PrintedBooks.price;
+    const discount = selectedProduct.PrintedBooks.discount;
+    const sold = selectedProduct.PrintedBooks.sold;
+    const publishDate = selectedProduct.PrintedBooks.publishDate;
+    const releaseDate = selectedProduct.PrintedBooks.releaseDate;
+    const titleID = selectedProduct.id;
+    const id = selectedProduct.PrintedBooks.id;
 
     const { data, error } = await supabase
       .from("PrintedBooks")
-      .insert({
+      .update({
         pages: pages,
         title_id: titleID,
         extra: extra,
@@ -867,6 +874,7 @@ function Product() {
         publish_date: publishDate,
         release_date: releaseDate,
       })
+      .eq("id", id)
       .select("*")
       .single();
 
@@ -878,28 +886,51 @@ function Product() {
 
     console.log("printed Book ID ... ", printedBook_ID);
 
-    return printedBook_ID;
+    // return printedBook_ID;
   }
 
-  async function setAudioData(target, titleID) {
-    const hours = +target.hours.value;
-    const minutes = +target.minutes.value;
-    const seconds = +target.seconds.value;
+  async function setAudioData() {
+    // const hours = +target.hours.value;
+    // const minutes = +target.minutes.value;
+    // const seconds = +target.seconds.value;
 
-    const duration = hours * 3600 + minutes * 60 + seconds;
-    const extention = target.extention.value;
-    const fileVolume = target.fileVolume.value;
+    // const duration = hours * 3600 + minutes * 60 + seconds;
+    // const extention = target.extention.value;
+    // const fileVolume = target.fileVolume.value;
 
-    const audioURL = AudioFileURL;
+    // const audioURL = AudioFileURL;
+
+    const duration = selectedProduct.Audiobooks.duration;
+    const fileVolume = selectedProduct.Audiobooks.fileVolume;
+    const audioURL = selectedProduct.Audiobooks.src;
+    const titleID = selectedProduct.id;
+
+    const isPublished = selectedProduct.Audiobooks.isPublished;
+    const isFeatured = selectedProduct.Audiobooks.isFeatured;
+    const price = selectedProduct.Audiobooks.price;
+    const discount = selectedProduct.Audiobooks.discount;
+    const sold = selectedProduct.Audiobooks.sold;
+    const publishDate = selectedProduct.Audiobooks.publishDate;
+    const releaseDate = selectedProduct.Audiobooks.releaseDate;
+
+    const id = selectedProduct.Audiobooks.id;
 
     const { data, error } = await supabase
       .from("Audiobooks")
-      .insert({
+      .update({
         duration: duration,
         src: audioURL,
         file_volume: fileVolume,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
         title_id: titleID,
       })
+      .eq("id", id)
       .select("*")
       .single();
 
@@ -911,26 +942,28 @@ function Product() {
 
     console.log("audio Book ID ... ", audioBook_ID);
 
-    return audioBook_ID;
+    // return audioBook_ID;
   }
 
-  async function setEBookData(target, titleID) {
-    const extention = target.eBookExtention.value;
-    const eBookURL = eBookFileURL;
-    const fileVolume = target.fileVolume.value;
-    const characters = target.characters.value;
-    const extra = target.extra.value;
-    const isPublished = target.isPublished.value;
-    const isFeatured = target.isFeatured.value;
-    const price = target.price.value;
-    const discount = target.discount.value;
-    const sold = target.sold.value;
-    const publishDate = target.publishDate.value;
-    const releaseDate = target.releaseDate.value;
+  async function setEBookData() {
+    const eBookURL = selectedProduct.Ebooks.src;
+    const fileVolume = selectedProduct.Ebooks.fileVolume;
+    const characters = selectedProduct.Ebooks.characters;
+    const extra = selectedProduct.Ebooks.extra;
+    const isPublished = selectedProduct.Ebooks.isPublished;
+    const isFeatured = selectedProduct.Ebooks.isFeatured;
+    const price = selectedProduct.Ebooks.price;
+    const discount = selectedProduct.Ebooks.discount;
+    const sold = selectedProduct.Ebooks.sold;
+    const publishDate = selectedProduct.Ebooks.publishDate;
+    const releaseDate = selectedProduct.Ebooks.releaseDate;
+    const titleID = selectedProduct.id;
+
+    const id = selectedProduct.Ebooks.id;
 
     const { data, error } = await supabase
       .from("Ebooks")
-      .insert({
+      .update({
         src: eBookURL,
         title_id: titleID,
         file_volume: fileVolume,
@@ -944,6 +977,7 @@ function Product() {
         publish_date: publishDate,
         release_date: releaseDate,
       })
+      .eq("id", id)
       .select()
       .single();
 
@@ -958,19 +992,22 @@ function Product() {
     return eBook_ID;
   }
 
-  async function setCardBookData(target, titleID) {
-    const extra = target.extra.value;
-    const isPublished = target.isPublished.value;
-    const isFeatured = target.isFeatured.value;
-    const price = target.price.value;
-    const discount = target.discount.value;
-    const sold = target.sold.value;
-    const publishDate = target.publishDate.value;
-    const releaseDate = target.releaseDate.value;
+  async function setCardBookData() {
+    const extra = selectedProduct.CardBooks.extra;
+    const isPublished = selectedProduct.CardBooks.isPublished;
+    const isFeatured = selectedProduct.CardBooks.isFeatured;
+    const price = selectedProduct.CardBooks.price;
+    const discount = selectedProduct.CardBooks.discount;
+    const sold = selectedProduct.CardBooks.sold;
+    const publishDate = selectedProduct.CardBooks.publishDate;
+    const releaseDate = selectedProduct.CardBooks.releaseDate;
+
+    const id = selectedProduct.CardBooks.id;
+    const titleID = selectedProduct.id;
 
     const { data, error } = await supabase
       .from("CardBooks")
-      .insert({
+      .update({
         title_id: titleID,
         extra: extra,
         is_published: isPublished,
@@ -981,6 +1018,7 @@ function Product() {
         publish_date: publishDate,
         release_date: releaseDate,
       })
+      .eq("id", id)
       .select()
       .single();
 
@@ -992,7 +1030,7 @@ function Product() {
 
     console.log("cardBook ID ... ", cardBook_ID);
 
-    return cardBook_ID;
+    // return cardBook_ID;
   }
 
   async function setCoverData(coverUrl, printedBookID) {
@@ -1103,27 +1141,28 @@ function Product() {
     const thesis = event.target.thesis.value;
     const ageRestriction = event.target.ageRestriction.value;
 
-    let title_id = await getTitleID(name);
+    // let title_id = await getTitleID(name);
+    let title_id = selectedProduct.id;
 
-    if (!title_id) {
-      console.log("trying to make a new Title!");
+    // if (!title_id) {
+    //   console.log("trying to make a new Title!");
 
-      const { data, error } = await supabase
-        .from("Titles")
-        .insert({
-          name: name,
-          description: description,
-          thesis: thesis,
-          trailer: VideoFileURL,
-          age_restriction: ageRestriction,
-        })
-        .select("*");
+    //   const { data, error } = await supabase
+    //     .from("Titles")
+    //     .insert({
+    //       name: name,
+    //       description: description,
+    //       thesis: thesis,
+    //       trailer: VideoFileURL,
+    //       age_restriction: ageRestriction,
+    //     })
+    //     .select("*");
 
-      data && (title_id = await data[0].id);
-      error && console.error("error is ...", error);
-    }
+    //   data && (title_id = await data[0].id);
+    //   error && console.error("error is ...", error);
+    // }
 
-    if (selectedType == "PrintedBook") {
+    if (selectedType == "PrintedBooks") {
       const printedBookID = await setPrintedData(event.target, title_id);
       console.log("printed Book ID ... ", printedBookID);
       printedBookID == "no ID for me" && (submitSucessfull = false);
@@ -1147,19 +1186,19 @@ function Product() {
       printSizeID == "no ID for me" && (submitSucessfull = false);
     }
 
-    if (selectedType == "AudioBook") {
+    if (selectedType == "Audiobooks") {
       const audioBookID = await setAudioData(event.target, title_id);
       console.log("AudioBook ID ... ", audioBookID);
       audioBookID == "no ID for me" && (submitSucessfull = false);
     }
 
-    if (selectedType == "Ebook") {
+    if (selectedType == "Ebooks") {
       const eBookID = await setEBookData(event.target, title_id);
       console.log("Ebook ID ... ", eBookID);
       eBookID == "no ID for me" && (submitSucessfull = false);
     }
 
-    if (selectedType == "CardBook") {
+    if (selectedType == "CardBooks") {
       const cardBookID = await setCardBookData(event.target, title_id);
       console.log("CardBook ID ... ", cardBookID);
       cardBookID == "no ID for me" && (submitSucessfull = false);
