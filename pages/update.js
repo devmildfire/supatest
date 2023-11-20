@@ -85,6 +85,14 @@ function Update() {
     console.log(`${publicUrl} returned`);
 
     setFileURL(publicUrl);
+
+    const coverObj = selectedProduct.PrintedBooks.cover[0];
+    const newCoverObj = { ...coverObj, source: publicUrl };
+    const printedBooksObj = {
+      ...selectedProduct.PrintedBooks,
+      cover: [newCoverObj],
+    };
+    setSelectedProduct({ ...selectedProduct, PrintedBooks: printedBooksObj });
   }
 
   async function handleEBookUpload(event) {
@@ -182,33 +190,6 @@ function Update() {
   }
 
   async function getProductByTableAndID(titleID, table, id) {
-    // const { data, error } = await supabase.from(table).select().eq("id", id);
-
-    const printedBookQueryString = `
-        *,
-        CardBooks ( * ),
-        Audiobooks ( * ),
-        Ebooks ( * ),
-        PrintedBooks ( *,
-          options:PrintOptions ( *,
-            size:PrintSize( * )
-          ),
-        cover:PrintedCover( * )
-        ),
-        TitlesAwards ( *,  awards: Awards(*) )
-      `;
-
-    const usualQueryString = `
-        *,
-        CardBooks ( * ),
-        Audiobooks ( * ),
-        Ebooks ( * ),
-        TitlesAwards ( *,  awards: Awards(*) )
-      `;
-
-    const queryString =
-      table == "PrintedBooks" ? printedBookQueryString : usualQueryString;
-
     setSelectedType(table);
 
     const { data, error } = await supabase
@@ -256,6 +237,34 @@ function Update() {
     console.log("selected object ... ", SelectedProductObject);
 
     getProductByTableAndID(titleID, table, id);
+  }
+
+  function changePrintBookIsPublished(event) {
+    console.log("change is published ...", event.target.checked);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      is_published: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookIsFeatured(event) {
+    console.log("change is featured ...", event.target.checked);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      is_featured: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
   }
 
   useEffect(() => {
@@ -411,59 +420,6 @@ function Update() {
             }}
           />
 
-          <label htmlFor="isPublished"> Is Published </label>
-          <input
-            type="checkbox"
-            id="isPublished"
-            name="isPublished"
-            defaultChecked="checked"
-          />
-
-          <label htmlFor="publishDate"> Publish Date </label>
-          <input
-            type="date"
-            id="publishDate"
-            name="publishDate"
-            defaultValue="2010-10-10"
-          />
-
-          <label htmlFor="releaseDate"> Release Date </label>
-          <input
-            type="date"
-            id="releaseDate"
-            name="releaseDate"
-            defaultValue="2010-10-10"
-          />
-
-          <label htmlFor="isFeatured"> Is Featured </label>
-          <input
-            type="checkbox"
-            id="isFeatured"
-            name="isFeatured"
-            defaultChecked=""
-          />
-
-          <label htmlFor="price"> Price </label>
-          <input
-            type="number"
-            min="0"
-            id="price"
-            name="price"
-            defaultValue="150"
-          />
-
-          <label htmlFor="discount"> Discount </label>
-          <input
-            type="number"
-            min="0"
-            id="discount"
-            name="discount"
-            defaultValue="0"
-          />
-
-          <label htmlFor="sold"> Number Sold </label>
-          <input type="number" min="0" id="sold" name="sold" defaultValue="0" />
-
           {selectedType == "PrintedBooks" && (
             <div className={styles.container}>
               <h1> Printed Book options </h1>
@@ -537,12 +493,81 @@ function Update() {
               />
 
               <label htmlFor="cover"> Cover </label>
-              {filePath && <img src={fileURL} alt={filePath} />}
+              {selectedProduct && (
+                <img
+                  src={selectedProduct.PrintedBooks.cover[0].source}
+                  alt={selectedProduct.PrintedBooks.cover[0].source}
+                />
+              )}
+              {selectedProduct && selectedProduct.PrintedBooks.cover[0].source}
               <input
                 type="file"
                 id="cover"
                 name="cover"
                 onChange={handleCoverUpload}
+              />
+
+              <label htmlFor="isPublished"> Is Published </label>
+              <input
+                type="checkbox"
+                id="isPublished"
+                name="isPublished"
+                // defaultChecked="checked"
+                value={selectedProduct.PrintedBooks.is_published || ""}
+                onChange={changePrintBookIsPublished}
+              />
+
+              <label htmlFor="publishDate"> Publish Date </label>
+              <input
+                type="date"
+                id="publishDate"
+                name="publishDate"
+                defaultValue="2010-10-10"
+              />
+
+              <label htmlFor="releaseDate"> Release Date </label>
+              <input
+                type="date"
+                id="releaseDate"
+                name="releaseDate"
+                defaultValue="2010-10-10"
+              />
+
+              <label htmlFor="isFeatured"> Is Featured </label>
+              <input
+                type="checkbox"
+                id="isFeatured"
+                name="isFeatured"
+                // defaultChecked=""
+                value={selectedProduct.PrintedBooks.is_featured || ""}
+                onChange={changePrintBookIsFeatured}
+              />
+
+              <label htmlFor="price"> Price </label>
+              <input
+                type="number"
+                min="0"
+                id="price"
+                name="price"
+                defaultValue="150"
+              />
+
+              <label htmlFor="discount"> Discount </label>
+              <input
+                type="number"
+                min="0"
+                id="discount"
+                name="discount"
+                defaultValue="0"
+              />
+
+              <label htmlFor="sold"> Number Sold </label>
+              <input
+                type="number"
+                min="0"
+                id="sold"
+                name="sold"
+                defaultValue="0"
               />
             </div>
           )}
