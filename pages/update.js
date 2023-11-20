@@ -267,6 +267,279 @@ function Update() {
     });
   }
 
+  function changePrintBookPages(event) {
+    console.log("change pages ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      pages: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookExtra(event) {
+    console.log("change extra ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      extra: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookLitForm(event) {
+    console.log("change lit form ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      lit_form: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookBindings(event) {
+    console.log("change bindings ...", event.target.value);
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      bindings: event.target.value,
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookCover(event) {
+    console.log("change cover ...", event.target.value);
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      cover: event.target.value,
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookPaper(event) {
+    console.log("change paper ...", event.target.value);
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      paper: event.target.value,
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookIllustrations(event) {
+    console.log("change illustrations ...", event.target.value);
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      illustrations: event.target.value,
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookHeight(event) {
+    console.log("change height ...", event.target.value);
+
+    const sizeObj = {
+      ...selectedProduct.PrintedBooks.options[0].size[0],
+      height: event.target.value,
+    };
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      size: [sizeObj],
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookWidth(event) {
+    console.log("change width ...", event.target.value);
+
+    const sizeObj = {
+      ...selectedProduct.PrintedBooks.options[0].size[0],
+      width: event.target.value,
+    };
+
+    const optionsObj = {
+      ...selectedProduct.PrintedBooks.options[0],
+      size: [sizeObj],
+    };
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      options: [optionsObj],
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookPublishDate(event) {
+    console.log("change publish date ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      publish_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookReleaseDate(event) {
+    console.log("change release date ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      release_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookPrice(event) {
+    console.log("change price ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      price: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookDiscount(event) {
+    console.log("change discount ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      discount: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function changePrintBookSold(event) {
+    console.log("change sold ...", event.target.value);
+
+    const printedBookObj = {
+      ...selectedProduct.PrintedBooks,
+      sold: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      PrintedBooks: printedBookObj,
+    });
+  }
+
+  function getWholeHours(duration) {
+    return Math.floor(duration / 3600);
+  }
+
+  function getWholeMinutes(duration) {
+    const minutes = Math.floor(
+      (duration - getWholeHours(duration) * 3600) / 60
+    );
+    return minutes;
+  }
+
+  function getSeconds(duration) {
+    const seconds =
+      duration -
+      getWholeHours(duration) * 3600 -
+      getWholeMinutes(duration) * 60;
+    return seconds;
+  }
+
+  function changeAudiobooksDuration(event) {
+    const hours = +document.getElementById("hours").value;
+    const minutes = +document.getElementById("minutes").value;
+    const seconds = +document.getElementById("seconds").value;
+
+    const duration = 3600 * hours + 60 * minutes + seconds;
+
+    const AudiobookObj = {
+      ...selectedProduct.Audiobooks,
+      duration: duration,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Audiobooks: AudiobookObj,
+    });
+  }
+
   useEffect(() => {
     getProducts();
   }, []);
@@ -430,7 +703,9 @@ function Update() {
                 min="0"
                 id="pages"
                 name="pages"
-                defaultValue="123"
+                // defaultValue="123"
+                value={selectedProduct.PrintedBooks.pages || ""}
+                onChange={changePrintBookPages}
               />
 
               <label htmlFor="extra"> Extra Info </label>
@@ -438,7 +713,9 @@ function Update() {
                 type="text"
                 id="extra"
                 name="extra"
-                defaultValue="Some extra info text"
+                // defaultValue="Some extra info text"
+                value={selectedProduct.PrintedBooks.extra || ""}
+                onChange={changePrintBookExtra}
               />
 
               <label htmlFor="litForm"> literature Form </label>
@@ -446,7 +723,9 @@ function Update() {
                 type="text"
                 id="litForm"
                 name="litForm"
-                defaultValue="Роман"
+                // defaultValue="Роман"
+                value={selectedProduct.PrintedBooks.lit_form || ""}
+                onChange={changePrintBookLitForm}
               />
 
               <label htmlFor="bindings"> Bindings </label>
@@ -454,7 +733,9 @@ function Update() {
                 type="text"
                 id="bindings"
                 name="bindings"
-                defaultValue="HardCore!"
+                // defaultValue="HardCore!"
+                value={selectedProduct.PrintedBooks.options[0].bindings || ""}
+                onChange={changePrintBookBindings}
               />
 
               <label htmlFor="coverType"> CoverType </label>
@@ -462,7 +743,9 @@ function Update() {
                 type="text"
                 id="coverType"
                 name="coverType"
-                defaultValue="DisCover!"
+                // defaultValue="DisCover!"
+                value={selectedProduct.PrintedBooks.options[0].cover || ""}
+                onChange={changePrintBookCover}
               />
 
               <label htmlFor="paper"> Paper </label>
@@ -470,7 +753,9 @@ function Update() {
                 type="text"
                 id="paper"
                 name="paper"
-                defaultValue="TwoPly"
+                // defaultValue="TwoPly"
+                value={selectedProduct.PrintedBooks.options[0].paper || ""}
+                onChange={changePrintBookPaper}
               />
 
               <label htmlFor="illustrations"> Illustrations </label>
@@ -478,18 +763,35 @@ function Update() {
                 type="text"
                 id="illustrations"
                 name="illustrations"
-                defaultValue="Dazzling!"
+                // defaultValue="Dazzling!"
+                value={
+                  selectedProduct.PrintedBooks.options[0].illustrations || ""
+                }
+                onChange={changePrintBookIllustrations}
               />
 
               <label htmlFor="width"> Width </label>
-              <input type="number" id="width" name="width" defaultValue="42" />
+              <input
+                type="number"
+                id="width"
+                name="width"
+                // defaultValue="42"
+                value={
+                  selectedProduct.PrintedBooks.options[0].size[0].width || ""
+                }
+                onChange={changePrintBookWidth}
+              />
 
               <label htmlFor="height"> Height </label>
               <input
                 type="number"
                 id="height"
                 name="height"
-                defaultValue="42"
+                // defaultValue="42"
+                value={
+                  selectedProduct.PrintedBooks.options[0].size[0].height || ""
+                }
+                onChange={changePrintBookHeight}
               />
 
               <label htmlFor="cover"> Cover </label>
@@ -522,7 +824,9 @@ function Update() {
                 type="date"
                 id="publishDate"
                 name="publishDate"
-                defaultValue="2010-10-10"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.PrintedBooks.publish_date || ""}
+                onChange={changePrintBookPublishDate}
               />
 
               <label htmlFor="releaseDate"> Release Date </label>
@@ -530,7 +834,9 @@ function Update() {
                 type="date"
                 id="releaseDate"
                 name="releaseDate"
-                defaultValue="2010-10-10"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.PrintedBooks.release_date || ""}
+                onChange={changePrintBookReleaseDate}
               />
 
               <label htmlFor="isFeatured"> Is Featured </label>
@@ -549,7 +855,9 @@ function Update() {
                 min="0"
                 id="price"
                 name="price"
-                defaultValue="150"
+                // defaultValue="150"
+                value={selectedProduct.PrintedBooks.price || ""}
+                onChange={changePrintBookPrice}
               />
 
               <label htmlFor="discount"> Discount </label>
@@ -558,7 +866,9 @@ function Update() {
                 min="0"
                 id="discount"
                 name="discount"
-                defaultValue="0"
+                // defaultValue="0"
+                value={selectedProduct.PrintedBooks.discount || ""}
+                onChange={changePrintBookDiscount}
               />
 
               <label htmlFor="sold"> Number Sold </label>
@@ -567,7 +877,9 @@ function Update() {
                 min="0"
                 id="sold"
                 name="sold"
-                defaultValue="0"
+                // defaultValue="0"
+                value={selectedProduct.PrintedBooks.sold || ""}
+                onChange={changePrintBookSold}
               />
             </div>
           )}
@@ -583,8 +895,12 @@ function Update() {
                   type="number"
                   id="hours"
                   name="hours"
-                  defaultValue="0"
+                  // defaultValue="0"
                   min="0"
+                  value={
+                    getWholeHours(selectedProduct.Audiobooks.duration) || ""
+                  }
+                  onChange={changeAudiobooksDuration}
                 />
 
                 <label htmlFor="minutes"> Minutes </label>
@@ -592,9 +908,13 @@ function Update() {
                   type="number"
                   id="minutes"
                   name="minutes"
-                  defaultValue="0"
+                  // defaultValue="0"
                   min="0"
                   max="59"
+                  value={
+                    getWholeMinutes(selectedProduct.Audiobooks.duration) || ""
+                  }
+                  onChange={changeAudiobooksDuration}
                 />
 
                 <label htmlFor="seconds"> Seconds </label>
@@ -605,6 +925,8 @@ function Update() {
                   defaultValue="0"
                   min="0"
                   max="59"
+                  value={getSeconds(selectedProduct.Audiobooks.duration) || ""}
+                  onChange={changeAudiobooksDuration}
                 />
               </div>
 
