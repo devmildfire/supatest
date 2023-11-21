@@ -2032,6 +2032,7 @@ export default function UpdateProductPage() {
       ) : (
         <div> No User Session </div>
       )}
+      <Nav />
     </div>
   );
 }

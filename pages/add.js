@@ -854,6 +854,7 @@ export default function AddProductPage() {
       ) : (
         <div> No User Session </div>
       )}
+      <Nav />
     </div>
   );
 }
