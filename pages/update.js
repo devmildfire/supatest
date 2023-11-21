@@ -58,30 +58,28 @@ function Update() {
     error && console.error("error is ...", error);
 
     if (selectedType == "PrintedBooks") {
-      // const printedBookID = await setPrintedData(event.target, title_id);
-      const result = await setPrintedData();
-      console.log(result);
+      const printedBookID = await setPrintedData();
 
-      // console.log("printed Book ID ... ", printedBookID);
-      // printedBookID == "no ID for me" && (submitSucessfull = false);
+      console.log("printed Book ID ... ", printedBookID);
+      printedBookID == "no ID for me" && (submitSucessfull = false);
 
-      // const coverID = await setCoverData(fileURL, printedBookID);
-      // console.log("Cover ID ... ", coverID);
-      // coverID == "no ID for me" && (submitSucessfull = false);
+      const coverID = await setCoverData(fileURL, printedBookID);
+      console.log("Cover ID ... ", coverID);
+      coverID == "no ID for me" && (submitSucessfull = false);
 
-      // const printedOptionsID = await setPrintOptionsData(
-      //   event.target,
-      //   printedBookID
-      // );
-      // console.log("Printed Options ID ... ", printedOptionsID);
-      // printedOptionsID == "no ID for me" && (submitSucessfull = false);
+      const printedOptionsID = await setPrintOptionsData(
+        event.target,
+        printedBookID
+      );
+      console.log("Printed Options ID ... ", printedOptionsID);
+      printedOptionsID == "no ID for me" && (submitSucessfull = false);
 
-      // const printSizeID = await setPrintSizeData(
-      //   event.target,
-      //   printedOptionsID
-      // );
-      // console.log("Print Size ID ... ", printSizeID);
-      // printSizeID == "no ID for me" && (submitSucessfull = false);
+      const printSizeID = await setPrintSizeData(
+        event.target,
+        printedOptionsID
+      );
+      console.log("Print Size ID ... ", printSizeID);
+      printSizeID == "no ID for me" && (submitSucessfull = false);
     }
 
     if (selectedType == "Audiobooks") {
@@ -101,19 +99,14 @@ function Update() {
       console.log("CardBook ID ... ", cardBookID);
       cardBookID == "no ID for me" && (submitSucessfull = false);
     }
-    // data && console.log("product data ... ", data);
 
     console.log("product id ... ", title_id);
 
     event.target.reset();
 
-    // error
-    //   ? alert(error)
     submitSucessfull == true
-      ? alert(`Created New ${selectedType} Product with name ${name}`)
-      : alert(`Creation FAILED for ${selectedType} Product with name ${name}`);
-
-    // router.reload();
+      ? alert(`Updated ${selectedType} Product with name ${name}`)
+      : alert(`Update FAILED for ${selectedType} Product with name ${name}`);
   }
 
   async function setPrintedData() {
@@ -157,7 +150,215 @@ function Update() {
 
     console.log("printed Book ID ... ", printedBook_ID);
 
-    return data ? data : error;
+    return printedBook_ID;
+  }
+
+  async function setCoverData() {
+    const id = selectedProduct.PrintedBooks.cover[0].id;
+    console.log("cover id ... ", id);
+
+    const source = selectedProduct.PrintedBooks.cover[0].source;
+    console.log("cover source ... ", source);
+
+    const { data, error } = await supabase
+      .from("PrintedCover")
+      .update({ source: source, shade: "light", blurHash: "NoHash" })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    console.log("cover data ... ", JSON.stringify(data, null, 2));
+    console.log("cover error ... ", error);
+
+    const cover_ID = data ? data.id : "no ID for me";
+
+    console.log("printed Book ID ... ", cover_ID);
+
+    return cover_ID;
+  }
+
+  async function setPrintOptionsData() {
+    const bindings = selectedProduct.PrintedBooks.options[0].bindings;
+    const coverType = selectedProduct.PrintedBooks.options[0].cover;
+    const paper = selectedProduct.PrintedBooks.options[0].paper;
+    const illustrations = selectedProduct.PrintedBooks.options[0].illustrations;
+    const id = selectedProduct.PrintedBooks.options[0].id;
+
+    const { data, error } = await supabase
+      .from("PrintOptions")
+      .update({
+        bindings: bindings,
+        cover: coverType,
+        paper: paper,
+        illustrations: illustrations,
+      })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    // console.log("print options data ... ", data);
+    console.log("print options data ... ", JSON.stringify(data, null, 2));
+    console.log("print options error ... ", error);
+
+    const printOptionsID = data ? data.id : "no ID for me";
+
+    console.log("print Options ID ... ", printOptionsID);
+
+    return printOptionsID;
+  }
+
+  async function setPrintSizeData() {
+    const width = selectedProduct.PrintedBooks.options[0].size[0].width;
+    const height = selectedProduct.PrintedBooks.options[0].size[0].height;
+    const id = selectedProduct.PrintedBooks.options[0].size[0].id;
+
+    const { data, error } = await supabase
+      .from("PrintSize")
+      .update({
+        width: width,
+        height: height,
+      })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    console.log("print size data ... ", JSON.stringify(data, null, 2));
+    console.log("print size error ... ", error);
+
+    const printSizeID = data ? data.id : "no ID for me";
+
+    console.log("print Size ID ... ", printSizeID);
+
+    return printSizeID;
+  }
+
+  async function setAudioData() {
+    const duration = selectedProduct.Audiobooks.duration;
+    const fileVolume = selectedProduct.Audiobooks.file_volume;
+    const audioURL = selectedProduct.Audiobooks.src;
+    const extra = selectedProduct.Audiobooks.extra;
+    const price = selectedProduct.Audiobooks.price;
+    const discount = selectedProduct.Audiobooks.discount;
+    const sold = selectedProduct.Audiobooks.sold;
+
+    const isPublished = selectedProduct.Audiobooks.is_published;
+    const isFeatured = selectedProduct.Audiobooks.is_featured;
+
+    const publishDate = selectedProduct.Audiobooks.publish_date;
+    const releaseDate = selectedProduct.Audiobooks.release_date;
+
+    const id = selectedProduct.Audiobooks.id;
+
+    const { data, error } = await supabase
+      .from("Audiobooks")
+      .update({
+        duration: duration,
+        src: audioURL,
+        file_volume: fileVolume,
+        extra: extra,
+        price: price,
+        discount: discount,
+        sold: sold,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        publish_date: publishDate,
+        release_date: releaseDate,
+      })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    // console.log("audiobook data ... ", data);
+    console.log("audiobook data ... ", JSON.stringify(data, null, 2));
+    console.log("audiobook error ... ", error);
+
+    const audioBook_ID = data ? data.id : "no ID for me";
+
+    console.log("audio Book ID ... ", audioBook_ID);
+
+    return audioBook_ID;
+  }
+
+  async function setEBookData() {
+    const eBookURL = selectedProduct.Ebooks.src;
+    const fileVolume = selectedProduct.Ebooks.file_volume;
+    const characters = selectedProduct.Ebooks.characters;
+    const extra = selectedProduct.Ebooks.extra;
+    const isPublished = selectedProduct.Ebooks.is_published;
+    const isFeatured = selectedProduct.Ebooks.is_featured;
+    const price = selectedProduct.Ebooks.price;
+    const discount = selectedProduct.Ebooks.discount;
+    const sold = selectedProduct.Ebooks.sold;
+    const publishDate = selectedProduct.Ebooks.publish_date;
+    const releaseDate = selectedProduct.Ebooks.release_date;
+    const id = selectedProduct.Ebooks.id;
+
+    const { data, error } = await supabase
+      .from("Ebooks")
+      .update({
+        src: eBookURL,
+        file_volume: fileVolume,
+        characters: characters,
+        extra: extra,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    console.log("ebook data ... ", data);
+    console.log("ebook data ... ", JSON.stringify(data, null, 2));
+    console.log("ebook error ... ", error);
+
+    const eBook_ID = data ? data.id : "no ID for me";
+
+    console.log("eBook ID ... ", eBook_ID);
+
+    return eBook_ID;
+  }
+
+  async function setCardBookData() {
+    const extra = selectedProduct.CardBooks.extra;
+    const isPublished = selectedProduct.CardBooks.is_published;
+    const isFeatured = selectedProduct.CardBooks.is_featured;
+    const price = selectedProduct.CardBooks.price;
+    const discount = selectedProduct.CardBooks.discount;
+    const sold = selectedProduct.CardBooks.sold;
+    const publishDate = selectedProduct.CardBooks.publish_date;
+    const releaseDate = selectedProduct.CardBooks.release_date;
+    const id = selectedProduct.CardBooks.id;
+
+    const { data, error } = await supabase
+      .from("CardBooks")
+      .update({
+        extra: extra,
+        is_published: isPublished,
+        is_featured: isFeatured,
+        price: price,
+        discount: discount,
+        sold: sold,
+        publish_date: publishDate,
+        release_date: releaseDate,
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    console.log("cardBook data ... ", data);
+    console.log("cardBook data ... ", JSON.stringify(data, null, 2));
+    console.log("cardBook error ... ", error);
+
+    const cardBook_ID = data ? data.id : "no ID for me";
+
+    console.log("cardBook ID ... ", cardBook_ID);
+
+    return cardBook_ID;
   }
 
   async function handleTrailerUpload(event) {
@@ -259,6 +460,8 @@ function Update() {
     console.log(`${publicUrl} returned`);
 
     setEBookFileURL(publicUrl);
+    const ebookObj = { ...selectedProduct.Ebooks, src: publicUrl };
+    setSelectedProduct({ ...selectedProduct, Ebooks: ebookObj });
   }
 
   async function handleAudioUpload(event) {
@@ -697,6 +900,20 @@ function Update() {
     });
   }
 
+  function changeAudiobookExtra(event) {
+    console.log("change extra ...", event.target.value);
+
+    const audiobookObj = {
+      ...selectedProduct.Audiobooks,
+      extra: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Audiobooks: audiobookObj,
+    });
+  }
+
   function changeAudiobookPublishDate(event) {
     console.log("change publish date ...", event.target.value);
 
@@ -764,6 +981,286 @@ function Update() {
     setSelectedProduct({
       ...selectedProduct,
       Audiobooks: audiobookObj,
+    });
+  }
+
+  function changeAudiobookIsPublished(event) {
+    console.log("change is published ...", event.target.checked);
+
+    const audiobookObj = {
+      ...selectedProduct.Audiobooks,
+      is_published: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Audiobooks: audiobookObj,
+    });
+  }
+
+  function changeAudiobookIsFeatured(event) {
+    console.log("change is featured ...", event.target.checked);
+
+    const audiobookObj = {
+      ...selectedProduct.Audiobooks,
+      is_featured: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Audiobooks: audiobookObj,
+    });
+  }
+
+  function changeEbookFileVolume(event) {
+    console.log("change file volume ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      file_volume: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookCharacters(event) {
+    console.log("change characters ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      characters: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookExtra(event) {
+    console.log("change extra ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      extra: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookIsPublished(event) {
+    console.log("change is published ...", event.target.checked);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      is_published: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookIsFeatured(event) {
+    console.log("change is featured ...", event.target.checked);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      is_featured: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookPublishDate(event) {
+    console.log("change publish date ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      publish_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookReleaseDate(event) {
+    console.log("change release date ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      release_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookPrice(event) {
+    console.log("change price ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      price: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookDiscount(event) {
+    console.log("change discount ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      discount: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeEbookSold(event) {
+    console.log("change sold ...", event.target.value);
+
+    const ebookObj = {
+      ...selectedProduct.Ebooks,
+      sold: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      Ebooks: ebookObj,
+    });
+  }
+
+  function changeCardBookExtra(event) {
+    console.log("change extra ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      extra: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookIsPublished(event) {
+    console.log("change is published ...", event.target.checked);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      is_published: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookIsFeatured(event) {
+    console.log("change is featured ...", event.target.checked);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      is_featured: event.target.checked,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookPublishDate(event) {
+    console.log("change publish date ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      publish_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookReleaseDate(event) {
+    console.log("change release date ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      release_date: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookPrice(event) {
+    console.log("change price ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      price: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookDiscount(event) {
+    console.log("change discount ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      discount: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
+    });
+  }
+
+  function changeCardBookSold(event) {
+    console.log("change sold ...", event.target.value);
+
+    const cardbookObj = {
+      ...selectedProduct.CardBooks,
+      sold: event.target.value,
+    };
+
+    setSelectedProduct({
+      ...selectedProduct,
+      CardBooks: cardbookObj,
     });
   }
 
@@ -1187,6 +1684,15 @@ function Update() {
                 onChange={changeAudiobooksFileVolume}
               />
 
+              <label htmlFor="extra"> Extra Info </label>
+              <input
+                type="text"
+                id="extra"
+                name="extra"
+                value={selectedProduct.Audiobooks.extra || ""}
+                onChange={changeAudiobookExtra}
+              />
+
               <label htmlFor="isPublished"> Is Published </label>
               <input
                 type="checkbox"
@@ -1194,7 +1700,7 @@ function Update() {
                 name="isPublished"
                 // defaultChecked="checked"
                 value={selectedProduct.Audiobooks.is_published || ""}
-                onChange={changePrintBookIsPublished}
+                onChange={changeAudiobookIsPublished}
               />
 
               <label htmlFor="publishDate"> Publish Date </label>
@@ -1203,8 +1709,8 @@ function Update() {
                 id="publishDate"
                 name="publishDate"
                 // defaultValue="2010-10-10"
-                value={selectedProduct.PrintedBooks.publish_date || ""}
-                onChange={changePrintBookPublishDate}
+                value={selectedProduct.Audiobooks.publish_date || ""}
+                onChange={changeAudiobookPublishDate}
               />
 
               <label htmlFor="releaseDate"> Release Date </label>
@@ -1213,8 +1719,8 @@ function Update() {
                 id="releaseDate"
                 name="releaseDate"
                 // defaultValue="2010-10-10"
-                value={selectedProduct.PrintedBooks.release_date || ""}
-                onChange={changePrintBookReleaseDate}
+                value={selectedProduct.Audiobooks.release_date || ""}
+                onChange={changeAudiobookReleaseDate}
               />
 
               <label htmlFor="isFeatured"> Is Featured </label>
@@ -1223,8 +1729,8 @@ function Update() {
                 id="isFeatured"
                 name="isFeatured"
                 // defaultChecked=""
-                value={selectedProduct.PrintedBooks.is_featured || ""}
-                onChange={changePrintBookIsFeatured}
+                value={selectedProduct.Audiobooks.is_featured || ""}
+                onChange={changeAudiobookIsFeatured}
               />
 
               <label htmlFor="price"> Price </label>
@@ -1234,8 +1740,8 @@ function Update() {
                 id="price"
                 name="price"
                 // defaultValue="150"
-                value={selectedProduct.PrintedBooks.price || ""}
-                onChange={changePrintBookPrice}
+                value={selectedProduct.Audiobooks.price || ""}
+                onChange={changeAudiobookPrice}
               />
 
               <label htmlFor="discount"> Discount </label>
@@ -1245,8 +1751,8 @@ function Update() {
                 id="discount"
                 name="discount"
                 // defaultValue="0"
-                value={selectedProduct.PrintedBooks.discount || ""}
-                onChange={changePrintBookDiscount}
+                value={selectedProduct.Audiobooks.discount || ""}
+                onChange={changeAudiobookDiscount}
               />
 
               <label htmlFor="sold"> Number Sold </label>
@@ -1256,8 +1762,8 @@ function Update() {
                 id="sold"
                 name="sold"
                 // defaultValue="0"
-                value={selectedProduct.PrintedBooks.sold || ""}
-                onChange={changePrintBookSold}
+                value={selectedProduct.Audiobooks.sold || ""}
+                onChange={changeAudiobookSold}
               />
             </div>
           )}
@@ -1295,7 +1801,9 @@ function Update() {
                 min="0"
                 id="fileVolume"
                 name="fileVolume"
-                defaultValue="0"
+                // defaultValue="0"
+                value={selectedProduct.Ebooks.file_volume || ""}
+                onChange={changeEbookFileVolume}
               />
 
               <label htmlFor="characters"> Characters Number </label>
@@ -1304,7 +1812,9 @@ function Update() {
                 min="0"
                 id="characters"
                 name="characters"
-                defaultValue="10000"
+                // defaultValue="10000"
+                value={selectedProduct.Ebooks.characters || ""}
+                onChange={changeEbookCharacters}
               />
 
               <label htmlFor="extra"> Extra Info </label>
@@ -1312,7 +1822,82 @@ function Update() {
                 type="text"
                 id="extra"
                 name="extra"
-                defaultValue="Some extra eBook info text"
+                // defaultValue="Some extra eBook info text"
+                value={selectedProduct.Ebooks.extra || ""}
+                onChange={changeEbookExtra}
+              />
+
+              <label htmlFor="isPublished"> Is Published </label>
+              <input
+                type="checkbox"
+                id="isPublished"
+                name="isPublished"
+                // defaultChecked="checked"
+                value={selectedProduct.Ebooks.is_published || ""}
+                onChange={changeEbookIsPublished}
+              />
+
+              <label htmlFor="publishDate"> Publish Date </label>
+              <input
+                type="date"
+                id="publishDate"
+                name="publishDate"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.Ebooks.publish_date || ""}
+                onChange={changeEbookPublishDate}
+              />
+
+              <label htmlFor="releaseDate"> Release Date </label>
+              <input
+                type="date"
+                id="releaseDate"
+                name="releaseDate"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.Ebooks.release_date || ""}
+                onChange={changeEbookReleaseDate}
+              />
+
+              <label htmlFor="isFeatured"> Is Featured </label>
+              <input
+                type="checkbox"
+                id="isFeatured"
+                name="isFeatured"
+                // defaultChecked=""
+                value={selectedProduct.Ebooks.is_featured || ""}
+                onChange={changeEbookIsFeatured}
+              />
+
+              <label htmlFor="price"> Price </label>
+              <input
+                type="number"
+                min="0"
+                id="price"
+                name="price"
+                // defaultValue="150"
+                value={selectedProduct.Ebooks.price || ""}
+                onChange={changeEbookPrice}
+              />
+
+              <label htmlFor="discount"> Discount </label>
+              <input
+                type="number"
+                min="0"
+                id="discount"
+                name="discount"
+                // defaultValue="0"
+                value={selectedProduct.Ebooks.discount || ""}
+                onChange={changeEbookDiscount}
+              />
+
+              <label htmlFor="sold"> Number Sold </label>
+              <input
+                type="number"
+                min="0"
+                id="sold"
+                name="sold"
+                // defaultValue="0"
+                value={selectedProduct.Ebooks.sold || ""}
+                onChange={changeEbookSold}
               />
             </div>
           )}
@@ -1326,7 +1911,82 @@ function Update() {
                 type="text"
                 id="extra"
                 name="extra"
-                defaultValue="Some extra eBook info text"
+                // defaultValue="Some extra eBook info text"
+                value={selectedProduct.CardBooks.extra || ""}
+                onChange={changeCardBookExtra}
+              />
+
+              <label htmlFor="isPublished"> Is Published </label>
+              <input
+                type="checkbox"
+                id="isPublished"
+                name="isPublished"
+                // defaultChecked="checked"
+                value={selectedProduct.CardBooks.is_published || ""}
+                onChange={changeCardBookIsPublished}
+              />
+
+              <label htmlFor="publishDate"> Publish Date </label>
+              <input
+                type="date"
+                id="publishDate"
+                name="publishDate"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.CardBooks.publish_date || ""}
+                onChange={changeCardBookPublishDate}
+              />
+
+              <label htmlFor="releaseDate"> Release Date </label>
+              <input
+                type="date"
+                id="releaseDate"
+                name="releaseDate"
+                // defaultValue="2010-10-10"
+                value={selectedProduct.CardBooks.release_date || ""}
+                onChange={changeCardBookReleaseDate}
+              />
+
+              <label htmlFor="isFeatured"> Is Featured </label>
+              <input
+                type="checkbox"
+                id="isFeatured"
+                name="isFeatured"
+                // defaultChecked=""
+                value={selectedProduct.CardBooks.is_featured || ""}
+                onChange={changeCardBookIsFeatured}
+              />
+
+              <label htmlFor="price"> Price </label>
+              <input
+                type="number"
+                min="0"
+                id="price"
+                name="price"
+                // defaultValue="150"
+                value={selectedProduct.CardBooks.price || ""}
+                onChange={changeCardBookPrice}
+              />
+
+              <label htmlFor="discount"> Discount </label>
+              <input
+                type="number"
+                min="0"
+                id="discount"
+                name="discount"
+                // defaultValue="0"
+                value={selectedProduct.CardBooks.discount || ""}
+                onChange={changeCardBookDiscount}
+              />
+
+              <label htmlFor="sold"> Number Sold </label>
+              <input
+                type="number"
+                min="0"
+                id="sold"
+                name="sold"
+                // defaultValue="0"
+                value={selectedProduct.CardBooks.sold || ""}
+                onChange={changeCardBookSold}
               />
             </div>
           )}
