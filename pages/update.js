@@ -1922,7 +1922,7 @@ function Update() {
                 id="isPublished"
                 name="isPublished"
                 // defaultChecked="checked"
-                value={selectedProduct.CardBooks.is_published || ""}
+                checked={selectedProduct.CardBooks.is_published || ""}
                 onChange={changeCardBookIsPublished}
               />
 
@@ -1952,7 +1952,7 @@ function Update() {
                 id="isFeatured"
                 name="isFeatured"
                 // defaultChecked=""
-                value={selectedProduct.CardBooks.is_featured || ""}
+                checked={selectedProduct.CardBooks.is_featured || ""}
                 onChange={changeCardBookIsFeatured}
               />
 
