@@ -4,6 +4,67 @@ import { useState, useEffect } from "react";
 // import Link from "next/link";
 import Nav from "@/components/nav";
 
+function Photos({ setupGallery }) {
+  const [photos, setPhotos] = useState([]);
+  const [photoURL, setPhotoURL] = useState("");
+
+  async function handlePhotoUpload(event) {
+    event.preventDefault();
+
+    const file = event.target.files[0];
+
+    console.log(file);
+
+    const { data, error } = await supabase.storage
+      .from("photos")
+      .upload(`photo_${file.name}`, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    console.log("photo return info ...", JSON.stringify(data, null, 2));
+    console.log("photo return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("photos")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    setPhotoURL(publicUrl);
+    setPhotos([...photos, publicUrl]);
+    setupGallery([...photos, publicUrl]);
+  }
+
+  return (
+    <div className={styles.container}>
+      <div> add photos </div>
+      <div>
+        <label htmlFor="photo"> Photo </label>
+        {/* {filePath && <img src={fileURL} alt={filePath} />} */}
+        <input
+          type="file"
+          id="photo"
+          name="photo"
+          onChange={handlePhotoUpload}
+        />
+      </div>
+
+      <div> gallery </div>
+      <div>
+        {photos?.map((photo, index) => (
+          <div>
+            {" "}
+            {index} - {photo} <img src={photo} alt="NoPhoto" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Product() {
   const [selectedType, setSelectedType] = useState("PrintedBook");
 
@@ -25,6 +86,12 @@ function Product() {
   const [canAdd, setCanAdd] = useState(true);
 
   const [presetAuthors, setPresetAuthors] = useState([]);
+
+  const [gallery, setGallery] = useState([]);
+
+  function setupGallery(gallery) {
+    setGallery(gallery);
+  }
 
   function handleTypeChange(event) {
     const target = event.target;
@@ -533,6 +600,22 @@ function Product() {
         .select("*");
 
       console.log("submitted authors responce ... ", submittedAuthors);
+
+      const titlesPhotos = gallery.map((photo, index) => {
+        return {
+          source: photo,
+          title_id: title_id,
+        };
+      });
+
+      console.log("titles and photos array ... ", titlesPhotos);
+
+      const submittedPhotos = await supabase
+        .from("Photos")
+        .insert(titlesPhotos)
+        .select("*");
+
+      console.log("submitted photos responce ... ", submittedPhotos);
     }
 
     if (selectedType == "PrintedBook") {
@@ -670,6 +753,10 @@ function Product() {
             </>
           )}
         </div>
+
+        <Photos setupGallery={setupGallery} />
+
+        <div> photos ammount - {gallery.length} </div>
 
         <label htmlFor="description"> description </label>
         <input
