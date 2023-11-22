@@ -23,13 +23,17 @@ function Authors() {
       .select("*")
       .single();
 
-    const author_id = await data.id;
+    let author_id;
+
+    data && data.length > 0 && (author_id = data.id);
 
     console.log("author data ... ", data);
 
     console.log("author id ... ", author_id);
 
-    error ? alert(error) : alert(`Added New Author with name ${name}`);
+    data
+      ? alert(`Added New Author with name ${name}`)
+      : alert("Add failed - no data");
     router.reload();
   }
 

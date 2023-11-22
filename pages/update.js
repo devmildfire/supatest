@@ -23,6 +23,13 @@ function Update() {
 
   const [name, setName] = useState("");
 
+  const [authors, setAuthors] = useState([]);
+  const [authorsList, setAuthorsList] = useState([]);
+  const [selectedAuthorID, setSelectedAuthorID] = useState(null);
+  const [canAdd, setCanAdd] = useState(true);
+
+  const [presetAuthors, setPresetAuthors] = useState([]);
+
   let trailerFile;
 
   async function handleSubmit(event) {
@@ -40,6 +47,29 @@ function Update() {
     let title_id = selectedProduct.id;
 
     console.log(`trying to update a Title ${title_id} !`);
+
+    const titlesAuthors = authors.map((author, index) => {
+      return {
+        author_id: author.id,
+        title_id: title_id,
+      };
+    });
+
+    console.log("titles and authors array ... ", titlesAuthors);
+
+    const deleteAuthors = await supabase
+      .from("Titles_Authors")
+      .delete()
+      .eq("title_id", title_id);
+
+    console.log("delete authors responce ... ", deleteAuthors);
+
+    const submittedAuthors = await supabase
+      .from("Titles_Authors")
+      .insert(titlesAuthors)
+      .select("*");
+
+    console.log("submitted authors responce ... ", submittedAuthors);
 
     const { data, error } = await supabase
       .from("Titles")
@@ -526,6 +556,85 @@ function Update() {
     error && console.error(JSON.stringify(error, null, 2));
   }
 
+  async function getAuthorsList() {
+    const { data, error } = await supabase.from("Authors").select("*");
+
+    data && console.log("authors data ... ", data);
+    error && alert(error);
+
+    data && setAuthorsList(data);
+  }
+
+  async function getAlreadySetAuthors(titleName, title_ID) {
+    // const titleName = document.getElementById("name").value;
+
+    const { data, error } = await supabase
+      .from("Titles_Authors")
+      .select("*, Authors(*)")
+      .eq("title_id", title_ID);
+
+    data?.length > 0
+      ? console.log("allready set authors ... ", data)
+      : console.log("No Authors for this Title yet");
+
+    data?.length > 0 && setPresetAuthors(data);
+
+    let AuthorsArray = [];
+
+    data?.map((item) => {
+      AuthorsArray.push({ id: item.Authors.id, name: item.Authors.name });
+    });
+
+    console.log("authors array ... ", AuthorsArray);
+    setAuthors([...AuthorsArray]);
+  }
+
+  async function handleAuthorsChange(event) {
+    const author_ID = event.target.value;
+
+    console.log("selected author id is ... ", author_ID);
+    setSelectedAuthorID(author_ID);
+
+    const authorAlreadyAdded = authors.find((author) => author.id == author_ID);
+    console.log(
+      "allready have selected author in this Title ... ",
+      authorAlreadyAdded
+    );
+
+    authorAlreadyAdded ? setCanAdd(false) : setCanAdd(true);
+  }
+
+  function handleAddAuthor(event) {
+    event.preventDefault();
+    console.log("authors List is ...", authorsList);
+
+    const authorToAdd = authorsList.find(
+      (author) => author.id == selectedAuthorID
+    );
+    console.log("author to add ...", authorToAdd);
+    setAuthors([...authors, authorToAdd]);
+    console.log("authors are ...", authors);
+
+    setCanAdd(false);
+  }
+
+  function handleRemoveAuthor(event) {
+    event.preventDefault();
+    console.log("current authors List is ...", authors);
+    console.log("selected author ID List is ...", selectedAuthorID);
+
+    const newAuthors = [
+      ...authors.toSpliced(
+        authors.findIndex((item) => item.id == selectedAuthorID),
+        1
+      ),
+    ];
+
+    setAuthors([...newAuthors]);
+    console.log("authors are ...", newAuthors);
+    setCanAdd(true);
+  }
+
   async function getFiles(url) {
     let trailerFile = await fetch(url)
       .then((r) => r.blob())
@@ -543,6 +652,7 @@ function Update() {
       .select(
         `
         *,
+        AuthorsList: Titles_Authors ( Author : Authors(*)),
         CardBooks ( * ),
         Audiobooks ( * ),
         Ebooks ( * ),
@@ -560,6 +670,8 @@ function Update() {
 
     data && setSelectedProduct(data);
     data && setName(data.name);
+
+    data && getAlreadySetAuthors(data.name, data.id);
 
     data && console.log("selected product ... ", JSON.stringify(data, null, 2));
 
@@ -1266,6 +1378,7 @@ function Update() {
 
   useEffect(() => {
     getProducts();
+    getAuthorsList();
   }, []);
 
   return (
@@ -1351,6 +1464,45 @@ function Update() {
               setSelectedProduct({ ...selectedProduct, name: e.target.value });
             }}
           />
+
+          <label htmlFor="authors"> Authors </label>
+          <select
+            id="authors"
+            name="authors"
+            defaultValue="0"
+            onChange={handleAuthorsChange}
+          >
+            <option value="0" key="noID" disabled>
+              {" "}
+              -- select author --{" "}
+            </option>
+            {authorsList?.map((author) => (
+              <option value={author.id} key={author.id}>
+                {author.id} - {author.name}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={canAdd ? handleAddAuthor : handleRemoveAuthor}
+            className={styles.button}
+          >
+            {canAdd
+              ? "Add selected Author to this Title"
+              : "Remove selected Author from this Title"}
+          </button>
+
+          <div>
+            <div> Current Authors</div>
+            <div>
+              {authors.length > 0 &&
+                authors?.map((author) => (
+                  <li key={author.id}>
+                    {author.id} - {author.name}
+                  </li>
+                ))}
+            </div>
+          </div>
 
           <label htmlFor="description"> description </label>
           <textarea

@@ -24,6 +24,8 @@ function Product() {
   const [selectedAuthorID, setSelectedAuthorID] = useState(null);
   const [canAdd, setCanAdd] = useState(true);
 
+  const [presetAuthors, setPresetAuthors] = useState([]);
+
   function handleTypeChange(event) {
     const target = event.target;
     const value = target.value;
@@ -42,6 +44,23 @@ function Product() {
     error && alert(error);
 
     data && setAuthorsList(data);
+  }
+
+  async function getAlreadySetAuthors() {
+    const titleName = document.getElementById("name").value;
+
+    const title_ID = await getTitleID(titleName);
+
+    const { data, error } = await supabase
+      .from("Titles_Authors")
+      .select("*, Authors(*)")
+      .eq("title_id", title_ID);
+
+    data?.length > 0
+      ? console.log("allready set authors ... ", data)
+      : console.log("No Authors for this Title yet");
+
+    data?.length > 0 && setPresetAuthors(data);
   }
 
   async function handleAuthorsChange(event) {
@@ -574,6 +593,7 @@ function Product() {
 
   useEffect(() => {
     getAuthorsList();
+    getAlreadySetAuthors();
   }, []);
 
   return (
@@ -586,45 +606,69 @@ function Product() {
           id="name"
           name="name"
           defaultValue="NewProductName"
+          onChange={getAlreadySetAuthors}
         />
 
-        <label htmlFor="authors"> Authors </label>
-        <select
-          id="authors"
-          name="authors"
-          defaultValue="0"
-          onChange={handleAuthorsChange}
-        >
-          <option value="0" key="noID" disabled>
-            {" "}
-            -- select author --{" "}
-          </option>
-          {authorsList?.map((author) => (
-            <option value={author.id} key={author.id}>
-              {author.id} - {author.name}
-            </option>
-          ))}
-        </select>
+        {presetAuthors.length < 1 && (
+          <>
+            <label htmlFor="authors"> Authors </label>
+            <select
+              id="authors"
+              name="authors"
+              defaultValue="0"
+              onChange={handleAuthorsChange}
+            >
+              <option value="0" key="noID" disabled>
+                {" "}
+                -- select author --{" "}
+              </option>
+              {authorsList?.map((author) => (
+                <option value={author.id} key={author.id}>
+                  {author.id} - {author.name}
+                </option>
+              ))}
+            </select>
 
-        <button
-          onClick={canAdd ? handleAddAuthor : handleRemoveAuthor}
-          className={styles.button}
-        >
-          {canAdd
-            ? "Add selected Author to this Title"
-            : "Remove selected Author from this Title"}
-        </button>
+            <button
+              onClick={canAdd ? handleAddAuthor : handleRemoveAuthor}
+              className={styles.button}
+            >
+              {canAdd
+                ? "Add selected Author to this Title"
+                : "Remove selected Author from this Title"}
+            </button>
+          </>
+        )}
 
         <div>
-          <div> Current Authors</div>
-          <div>
-            {authors.length > 0 &&
-              authors?.map((author) => (
-                <li key={author.id}>
-                  {author.id} - {author.name}
-                </li>
-              ))}
-          </div>
+          {presetAuthors.length < 1 ? (
+            <>
+              <p>No Preset Authors</p>
+              <div>
+                <div> Current Authors</div>
+                <div>
+                  {authors.length > 0 &&
+                    authors?.map((author) => (
+                      <li key={author.id}>
+                        {author.id} - {author.name}
+                      </li>
+                    ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* <p>{JSON.stringify(presetAuthors, null, 2)}</p> */}
+              <div>
+                {presetAuthors.length > 0 &&
+                  presetAuthors.map((author) => (
+                    <li key={author.author_id}>
+                      {author.author_id} - {author.Authors.name}
+                    </li>
+                  ))}
+              </div>
+            </>
+          )}
         </div>
 
         <label htmlFor="description"> description </label>

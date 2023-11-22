@@ -1,11 +1,14 @@
 import styles from "../styles/Home.module.css";
 import supabase from "../utils/supabase";
 import Link from "next/link";
+import Nav from "@/components/nav";
 
 export async function getStaticProps() {
   const { data: Titles, error } = await supabase
     .from("Titles")
-    .select("*, PrintedBooks(*), Audiobooks(*), Ebooks(*), CardBooks(*)");
+    .select(
+      "*,AuthorsList: Titles_Authors ( Author : Authors(*)), PrintedBooks(*), Audiobooks(*), Ebooks(*), CardBooks(*)"
+    );
 
   // console.log(products);
 
@@ -25,12 +28,7 @@ export default function Home({ Titles }) {
     <div className={styles.container}>
       <h1>Hello!</h1>
       <pre> {JSON.stringify(Titles, null, 2)} </pre>
-      <div className={styles.container}>
-        <Link href="/login">Login</Link>
-        <Link href="/awards">Add / Remove Awards</Link>
-        <Link href="/add">Add Products</Link>
-        <Link href="/deleteProduct">Delete Products</Link>
-      </div>
+      <Nav />
     </div>
   );
 }

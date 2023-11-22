@@ -29,6 +29,7 @@ export default function AllProductsPage() {
       let { data: Titles, error } = await supabase.from("Titles").select(
         `
           *,
+          AuthorsList: Titles_Authors ( Author : Authors(*)),
           CardBooks ( * ),
           Audiobooks ( * ),
           Ebooks ( * ),
