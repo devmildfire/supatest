@@ -55,7 +55,7 @@ function Photos({ setupGallery }) {
       <div> gallery </div>
       <div>
         {photos?.map((photo, index) => (
-          <div>
+          <div key={photo}>
             {" "}
             {index} - {photo} <img src={photo} alt="NoPhoto" />
           </div>
