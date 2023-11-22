@@ -8,6 +8,18 @@ import Nav from "@/components/nav";
 function Authors() {
   // const [fileURL, setFileURL] = useState("");
   const router = useRouter();
+  const [canAdd, setCanAdd] = useState(true);
+
+  async function handleAuthorChange() {
+    const currentAuthor = document.getElementById("name").value;
+
+    const { data, error } = await supabase
+      .from("Authors")
+      .select("*")
+      .eq("name", currentAuthor);
+
+    data.length > 0 ? setCanAdd(false) : setCanAdd(true);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -37,16 +49,30 @@ function Authors() {
     router.reload();
   }
 
+  useEffect(() => {
+    handleAuthorChange();
+  }, []);
+
   return (
     <div className={styles.container}>
       <h1> Add Author </h1>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <label htmlFor="name"> title </label>
-        <input type="text" id="name" name="name" defaultValue="Hank Moody" />
+        <label htmlFor="name"> Name </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          defaultValue="Hank Moody"
+          onChange={handleAuthorChange}
+        />
 
-        <button type="submit" className={styles.button}>
-          Add New Author
-        </button>
+        {canAdd ? (
+          <button type="submit" className={styles.button}>
+            Add New Author
+          </button>
+        ) : (
+          <p> Allready have this author </p>
+        )}
       </form>
     </div>
   );
@@ -64,6 +90,13 @@ function AuthorsList() {
     data && setAuthors(data);
   }
 
+  async function deleteAuthor(id, name) {
+    const { error } = await supabase.from("Authors").delete().eq("id", id);
+    !error && alert(`deleted author ${name}`);
+
+    getAuthors();
+  }
+
   useEffect(() => {
     getAuthors();
   }, []);
@@ -72,8 +105,19 @@ function AuthorsList() {
     <div className={styles.container}>
       {authors?.map((author) => (
         <div key={author.id}>
-          {" "}
-          {author.id} - {author.name}{" "}
+          <span>
+            {author.id} - {author.name}
+          </span>
+          {"  "}
+          <button
+            className={styles.button}
+            onClick={() => {
+              deleteAuthor(author.id, author.name);
+            }}
+          >
+            {" "}
+            delete{" "}
+          </button>
         </div>
       ))}
     </div>
