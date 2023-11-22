@@ -48,6 +48,34 @@ function Authors() {
   );
 }
 
+function AuthorsList() {
+  const [authors, setAuthors] = useState(null);
+
+  async function getAuthors() {
+    const { data, error } = await supabase.from("Authors").select("*");
+
+    data && console.log("authors data ... ", data);
+    error && alert(error);
+
+    data && setAuthors(data);
+  }
+
+  useEffect(() => {
+    getAuthors();
+  }, []);
+
+  return (
+    <div className={styles.container}>
+      {authors?.map((author) => (
+        <div key={author.id}>
+          {" "}
+          {author.id} - {author.name}{" "}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AuthorsPage() {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
@@ -76,6 +104,7 @@ export default function AuthorsPage() {
         <div>
           <p> logged in as {user.email} </p>
           <Authors />
+          <AuthorsList />
         </div>
       ) : (
         <div> No User Session </div>

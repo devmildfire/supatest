@@ -19,6 +19,11 @@ function Product() {
   const [eBookFilePath, setEBookFilePath] = useState("");
   const [eBookFileURL, setEBookFileURL] = useState("");
 
+  const [authors, setAuthors] = useState([]);
+  const [authorsList, setAuthorsList] = useState([]);
+  const [selectedAuthorID, setSelectedAuthorID] = useState(null);
+  const [canAdd, setCanAdd] = useState(true);
+
   function handleTypeChange(event) {
     const target = event.target;
     const value = target.value;
@@ -28,6 +33,61 @@ function Product() {
 
     setSelectedType(value);
     console.log(selectedType);
+  }
+
+  async function getAuthorsList() {
+    const { data, error } = await supabase.from("Authors").select("*");
+
+    data && console.log("authors data ... ", data);
+    error && alert(error);
+
+    data && setAuthorsList(data);
+  }
+
+  async function handleAuthorsChange(event) {
+    const author_ID = event.target.value;
+
+    console.log("selected author id is ... ", author_ID);
+    setSelectedAuthorID(author_ID);
+
+    const authorAlreadyAdded = authors.find((author) => author.id == author_ID);
+    console.log(
+      "allready have selected author in this Title ... ",
+      authorAlreadyAdded
+    );
+
+    authorAlreadyAdded ? setCanAdd(false) : setCanAdd(true);
+  }
+
+  function handleAddAuthor(event) {
+    event.preventDefault();
+    console.log("authors List is ...", authorsList);
+
+    const authorToAdd = authorsList.find(
+      (author) => author.id == selectedAuthorID
+    );
+    console.log("author to add ...", authorToAdd);
+    setAuthors([...authors, authorToAdd]);
+    console.log("authors are ...", authors);
+
+    setCanAdd(false);
+  }
+
+  function handleRemoveAuthor(event) {
+    event.preventDefault();
+    console.log("current authors List is ...", authors);
+    console.log("selected author ID List is ...", selectedAuthorID);
+
+    const newAuthors = [
+      ...authors.toSpliced(
+        authors.findIndex((item) => item.id == selectedAuthorID),
+        1
+      ),
+    ];
+
+    setAuthors([...newAuthors]);
+    console.log("authors are ...", newAuthors);
+    setCanAdd(true);
   }
 
   async function handleCoverUpload(event) {
@@ -438,6 +498,22 @@ function Product() {
 
       data && (title_id = await data[0].id);
       error && console.error("error is ...", error);
+
+      const titlesAuthors = authors.map((author, index) => {
+        return {
+          author_id: author.id,
+          title_id: title_id,
+        };
+      });
+
+      console.log("titles and authors array ... ", titlesAuthors);
+
+      const submittedAuthors = await supabase
+        .from("Titles_Authors")
+        .insert(titlesAuthors)
+        .select("*");
+
+      console.log("submitted authors responce ... ", submittedAuthors);
     }
 
     if (selectedType == "PrintedBook") {
@@ -496,6 +572,10 @@ function Product() {
     // router.reload();
   }
 
+  useEffect(() => {
+    getAuthorsList();
+  }, []);
+
   return (
     <div className={styles.container}>
       <h1> Add Product </h1>
@@ -507,6 +587,45 @@ function Product() {
           name="name"
           defaultValue="NewProductName"
         />
+
+        <label htmlFor="authors"> Authors </label>
+        <select
+          id="authors"
+          name="authors"
+          defaultValue="0"
+          onChange={handleAuthorsChange}
+        >
+          <option value="0" key="noID" disabled>
+            {" "}
+            -- select author --{" "}
+          </option>
+          {authorsList?.map((author) => (
+            <option value={author.id} key={author.id}>
+              {author.id} - {author.name}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={canAdd ? handleAddAuthor : handleRemoveAuthor}
+          className={styles.button}
+        >
+          {canAdd
+            ? "Add selected Author to this Title"
+            : "Remove selected Author from this Title"}
+        </button>
+
+        <div>
+          <div> Current Authors</div>
+          <div>
+            {authors.length > 0 &&
+              authors?.map((author) => (
+                <li key={author.id}>
+                  {author.id} - {author.name}
+                </li>
+              ))}
+          </div>
+        </div>
 
         <label htmlFor="description"> description </label>
         <input
