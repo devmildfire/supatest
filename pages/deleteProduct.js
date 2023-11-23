@@ -25,7 +25,6 @@ function RemoveProduct() {
           ),
           cover:PrintedCover( * )
         ),
-        CardBooks ( * ),
         TitlesAwards ( *, awards: Awards(*) )
       `
     );
