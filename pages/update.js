@@ -1607,6 +1607,7 @@ function Update() {
                     onClick={() => {
                       removePhoto(index);
                     }}
+                    className={styles.button}
                   >
                     {" "}
                     Remove Photo{" "}
