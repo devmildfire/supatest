@@ -29,6 +29,7 @@ function Update() {
   const [canAdd, setCanAdd] = useState(true);
 
   const [presetAuthors, setPresetAuthors] = useState([]);
+  const [photos, setPhotos] = useState([]);
 
   let trailerFile;
 
@@ -70,6 +71,29 @@ function Update() {
       .select("*");
 
     console.log("submitted authors responce ... ", submittedAuthors);
+
+    const deletePhotos = await supabase
+      .from("Photos")
+      .delete()
+      .eq("title_id", title_id);
+
+    console.log("delete photos responce ... ", deletePhotos);
+
+    const titlesPhotos = photos.map((photo, index) => {
+      return {
+        source: photo,
+        title_id: title_id,
+      };
+    });
+
+    console.log("titles and photos array ... ", titlesPhotos);
+
+    const submittedPhotos = await supabase
+      .from("Photos")
+      .insert(titlesPhotos)
+      .select("*");
+
+    console.log("submitted photos responce ... ", submittedPhotos);
 
     const { data, error } = await supabase
       .from("Titles")
@@ -635,6 +659,61 @@ function Update() {
     setCanAdd(true);
   }
 
+  async function getPhotos(title_ID) {
+    // const titleName = document.getElementById("name").value;
+
+    const { data, error } = await supabase
+      .from("Photos")
+      .select("*")
+      .eq("title_id", title_ID);
+
+    data?.length > 0
+      ? console.log("allready set photos ... ", data)
+      : console.log("No Photos for this Title yet");
+
+    const photosArray = data?.map((photo) => {
+      return photo.source;
+    });
+
+    data?.length > 0 && setPhotos([...photosArray]);
+    data?.length == 0 && setPhotos([]);
+  }
+
+  async function handlePhotoUpload(event) {
+    event.preventDefault();
+
+    const file = event.target.files[0];
+
+    console.log(file);
+
+    const { data, error } = await supabase.storage
+      .from("photos")
+      .upload(`photo_${file.name}`, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    console.log("photo return info ...", JSON.stringify(data, null, 2));
+    console.log("photo return error ...", JSON.stringify(error, null, 2));
+
+    data.path && console.log(`${data.path} returned`);
+
+    const publicUrl = supabase.storage
+      .from("photos")
+      .getPublicUrl(`${data.path}`).data.publicUrl;
+
+    console.log(`${publicUrl} returned`);
+
+    // setPhotoURL(publicUrl);
+    setPhotos([...photos, publicUrl]);
+    // setupGallery([...photos, publicUrl]);
+  }
+
+  function removePhoto(index) {
+    const newPhotos = [...photos.toSpliced(index, 1)];
+    setPhotos([...newPhotos]);
+  }
+
   async function getFiles(url) {
     let trailerFile = await fetch(url)
       .then((r) => r.blob())
@@ -695,6 +774,7 @@ function Update() {
     console.log("selected object ... ", SelectedProductObject);
 
     getProductByTableAndID(titleID, table, id);
+    getPhotos(titleID);
   }
 
   function changePrintBookIsPublished(event) {
@@ -1501,6 +1581,37 @@ function Update() {
                     {author.id} - {author.name}
                   </li>
                 ))}
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            <div> add photos </div>
+            <div>
+              <label htmlFor="photo"> Photo </label>
+              <input
+                type="file"
+                id="photo"
+                name="photo"
+                onChange={handlePhotoUpload}
+              />
+            </div>
+
+            <div> gallery </div>
+            <div>
+              {photos?.map((photo, index) => (
+                <div key={photo}>
+                  {" "}
+                  {index} - <img src={photo} alt="NoPhoto" />{" "}
+                  <button
+                    onClick={() => {
+                      removePhoto(index);
+                    }}
+                  >
+                    {" "}
+                    Remove Photo{" "}
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
 
