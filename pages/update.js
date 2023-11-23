@@ -732,6 +732,7 @@ function Update() {
         `
         *,
         AuthorsList: Titles_Authors ( Author : Authors(*)),
+        Photos( * ),
         CardBooks ( * ),
         Audiobooks ( * ),
         Ebooks ( * ),

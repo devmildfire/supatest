@@ -14,6 +14,9 @@ function RemoveProduct() {
     const { data, error } = await supabase.from("Titles").select(
       `
         *,
+        AuthorsList: Titles_Authors ( Author : Authors(*)),
+        Photos( * ),
+        CardBooks ( * ),
         Audiobooks ( * ),
         Ebooks ( * ),
         PrintedBooks ( *,

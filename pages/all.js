@@ -30,6 +30,7 @@ export default function AllProductsPage() {
         `
           *,
           AuthorsList: Titles_Authors ( Author : Authors(*)),
+          Photos( * ),
           CardBooks ( * ),
           Audiobooks ( * ),
           Ebooks ( * ),

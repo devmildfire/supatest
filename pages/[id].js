@@ -38,6 +38,9 @@ export default function ProductPage({ params }) {
         .select(
           `
           *,
+          AuthorsList: Titles_Authors ( Author : Authors(*)),
+          Photos( * ),
+          CardBooks ( * ),
           Audiobooks ( * ),
           Ebooks ( * ),
           PrintedBooks ( *,
