@@ -2,6 +2,8 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { hasCookie, setCookie, getCookie } from "cookies-next";
+import { v4 as uuidv4 } from "uuid";
 import Nav from "@/components/nav";
 
 function Login() {
@@ -95,6 +97,26 @@ function SignUp() {
 
 function SessionInfo({ session }) {
   // console.log("session is...", session);
+  const [cartID, setCartID] = useState("");
+
+  function checkCookies() {
+    const cookie = hasCookie("myNewCoockie", { path: "/" })
+      ? getCookie("myNewCoockie", { path: "/" })
+      : "";
+    cookie && setCartID(cookie);
+
+    return cookie ? true : false;
+  }
+
+  function setNewCookie() {
+    const cookieString = uuidv4();
+    setCookie("myNewCoockie", cookieString, {
+      path: "/",
+      sameSite: "none",
+      secure: true,
+    });
+    setCartID(cookieString);
+  }
 
   const router = useRouter();
 
@@ -108,12 +130,17 @@ function SessionInfo({ session }) {
     router.reload();
   }
 
+  useEffect(() => {
+    !checkCookies() && setNewCookie();
+  }, []);
+
   return (
     // <div className={styles.container}>{JSON.stringify(session, null, 2)}</div>
     <div className={styles.container}>
       {" "}
       currently logged in as {session.user.email}
       {/* <h1> Log Out </h1> */}
+      <h1> current cart ID : {cartID} </h1>
       <form onSubmit={handleSubmit}>
         <button type="submit" className={styles.button}>
           Log Out
