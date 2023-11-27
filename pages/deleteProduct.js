@@ -96,7 +96,7 @@ function RemoveProduct() {
           ];
 
           const audioString = JSON.stringify(optionValues[0]);
-          const ebooktring = JSON.stringify(optionValues[1]);
+          const ebookString = JSON.stringify(optionValues[1]);
           const printedString = JSON.stringify(optionValues[2]);
           const cardString = JSON.stringify(optionValues[3]);
 
@@ -106,7 +106,7 @@ function RemoveProduct() {
                 <option value={audioString}>{title.name} - Audiobok</option>
               )}
               {title.Ebooks && (
-                <option value={ebooktring}>{title.name} - eBook</option>
+                <option value={ebookString}>{title.name} - eBook</option>
               )}
               {title.PrintedBooks && (
                 <option value={printedString}>
