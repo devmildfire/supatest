@@ -5,6 +5,7 @@ export default function Nav() {
   return (
     <div className={styles.container}>
       <Link href="/login">Login</Link>
+      <Link href="/shelf">Shelf</Link>
       <Link href="/all">All Products</Link>
       <Link href="/authors"> Add / Delete Authors</Link>
       <Link href="/awards">Add / Remove Awards from Titles</Link>
