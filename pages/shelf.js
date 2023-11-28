@@ -240,25 +240,16 @@ function ProductsShelf() {
     //   console.log("all shelf items are ...", JSON.stringify(shelf, null, 2));
   }
 
-  // useEffect(() => {
-  //   setCartID(setOrGetCartCookie());
-  //   getTitles();
-
-  //   getCartFromDB(setOrGetCartCookie());
-
-  //   console.log(JSON.stringify(cart, null, 2));
-  //   updateTotal();
-  // }, [cart]);
-
   useEffect(() => {
     setCartID(setOrGetCartCookie());
     getTitles();
 
     getCartFromDB(setOrGetCartCookie());
-
-    console.log(JSON.stringify(cart, null, 2));
-    updateTotal();
   }, []);
+
+  useEffect(() => {
+    updateTotal();
+  }, [cart]);
 
   return (
     <div className={styles.container}>
@@ -286,17 +277,6 @@ function ProductsShelf() {
         <div>total price {total} </div>
         <div>cart ID: {cartID} </div>
       </div>
-
-      {/* {selectedProduct && (
-        <button
-          className={styles.button}
-          onClick={() => {
-            deleteProduct(selectedProduct);
-          }}
-        >
-          Delete Product
-        </button>
-      )} */}
     </div>
   );
 }
