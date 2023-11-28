@@ -2,16 +2,23 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-// import Link from "next/link";
+import { setOrGetCartCookie } from "@/utils/cartID";
+
 import Nav from "@/components/nav";
 
 function ShelfItem({ updateCart, cart, name, type, price }) {
   const [number, setNumber] = useState(0);
 
-  // useEffect(() => {
-  //   console.log(`number is now ${number} for ${name} - ${type}`);
-  //   // updateCart(name, type, number);
-  // }, [number]);
+  useEffect(() => {
+    const index = cart.findIndex(
+      (item) => item.name == name && item.type == type
+    );
+    index !== -1 &&
+      (console.log(
+        `item index  for ${name} - ${type} is ${cart[index].number}`
+      ),
+      setNumber(cart[index].number));
+  });
 
   return (
     <div key={name + type}>
@@ -20,22 +27,24 @@ function ShelfItem({ updateCart, cart, name, type, price }) {
       </span>
 
       <button
+        className={styles.shelfButton}
         onClick={() => {
           setNumber(number - 1);
-          updateCart(name, type, number - 1);
+          updateCart(name, type, price, number - 1);
         }}
         disabled={number == 0}
       >
-        remove
+        -
       </button>
       <span> {number} </span>
       <button
+        className={styles.shelfButton}
         onClick={() => {
           setNumber(number + 1);
-          updateCart(name, type, number + 1);
+          updateCart(name, type, price, number + 1);
         }}
       >
-        add
+        +
       </button>
     </div>
   );
@@ -44,9 +53,90 @@ function ShelfItem({ updateCart, cart, name, type, price }) {
 function ProductsShelf() {
   const [shelf, setShelf] = useState([]);
   const [cart, setCart] = useState([]);
+  const [cartID, setCartID] = useState("");
+  const [total, setTotal] = useState(0);
   const [titles, setTitles] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const router = useRouter();
+
+  async function getCartFromDB(id) {
+    const { data, error } = await supabase.from("Cart").select().eq("id", id);
+
+    data &&
+      console.log("DB cart fetch success ... ", JSON.stringify(data, null, 2));
+    error &&
+      console.log("DBcart fetch FAILED ... ", JSON.stringify(error, null, 2));
+
+    // let itemList = []
+
+    const itemList = data?.map((item) => {
+      return {
+        name: item.name,
+        type: item.category,
+        price: item.price,
+        number: item.quantity,
+      };
+    });
+
+    console.log("fetched item list ... ", JSON.stringify(itemList, null, 2));
+
+    setCart([...itemList]);
+  }
+
+  async function addItemToDB(name, type, price, number) {
+    const { data, error } = await supabase
+      .from("Cart")
+      .insert({
+        id: cartID,
+        name: name,
+        category: type,
+        price: price,
+        quantity: number,
+        summ: price * number,
+      })
+      .select();
+    data &&
+      console.log("DB insert success ... ", JSON.stringify(data, null, 2));
+    error &&
+      console.log("DB insert FAILED ... ", JSON.stringify(error, null, 2));
+  }
+
+  async function updateItemInDB(name, type, price, number) {
+    const { data, error } = await supabase
+      .from("Cart")
+      .upsert({
+        id: cartID,
+        name: name,
+        category: type,
+        price: price,
+        quantity: number,
+        summ: price * number,
+      })
+      .select();
+    data &&
+      console.log("DB update success ... ", JSON.stringify(data, null, 2));
+    error &&
+      console.log("DB update FAILED ... ", JSON.stringify(error, null, 2));
+  }
+
+  async function deleteItemInDB(name, type) {
+    const { error } = await supabase
+      .from("Cart")
+      .delete()
+      .eq("id", cartID)
+      .eq("name", name)
+      .eq("category", type);
+    !error &&
+      console.log(
+        "DB item delete success ... ",
+        JSON.stringify(error, null, 2)
+      );
+    error &&
+      console.log(
+        "DB item delete update FAILED ... ",
+        JSON.stringify(error, null, 2)
+      );
+  }
 
   function getCartIndex(name, type) {
     const index = cart.findIndex(
@@ -55,34 +145,37 @@ function ProductsShelf() {
     return index;
   }
 
-  function updateCart(name, type, number) {
+  function updateCart(name, type, price, number) {
     const index = getCartIndex(name, type);
     // console.log("index is...", index);
 
     let list = [...cart];
-    // console.log("list is...", JSON.stringify(list, null, 2));
 
     index == -1 &&
-      setCart([
+      //  добавление нового пункта корзины
+      (setCart([
         ...cart.filter((item) => item.number !== 0),
-        { name: name, type: type, number: number },
-      ]);
+        { name: name, type: type, price: price, number: number },
+      ]),
+      addItemToDB(name, type, price, number));
 
     index !== -1 &&
-      ((list[index] = { name: name, type: type, number: number }),
+      //  редактирование существующего пункта корзины
+      ((list[index] = { name: name, type: type, price: price, number: number }),
       (list = list.filter((item) => item.number !== 0)),
-      setCart([...list]));
-
-    // console.log(
-    //   `updated cart with an item ${JSON.stringify([...cart], null, 2)}`
-    // );
+      setCart([...list]),
+      number == 0
+        ? deleteItemInDB(name, type)
+        : updateItemInDB(name, type, price, number));
   }
 
-  // async function cartItemToBase() {
-  //   const {data, error} = await supabase
-  //     .from("Cart")
-  //     .inser
-  // }
+  function updateTotal() {
+    let summ = 0;
+    cart?.forEach((item) => {
+      summ += item.price * item.number;
+    });
+    setTotal(summ);
+  }
 
   async function getTitles() {
     let shelfItems = [];
@@ -116,7 +209,7 @@ function ProductsShelf() {
           ...shelfItems,
           {
             name: item.name,
-            type: "PrintedBook",
+            type: "PrintBook",
             price: item.PrintedBooks.price,
           },
         ]);
@@ -124,7 +217,7 @@ function ProductsShelf() {
       item.Audiobooks &&
         (shelfItems = [
           ...shelfItems,
-          { name: item.name, type: "Audiobook", price: item.Audiobooks.price },
+          { name: item.name, type: "AudioBook", price: item.Audiobooks.price },
         ]);
 
       item.Ebooks &&
@@ -147,37 +240,25 @@ function ProductsShelf() {
     //   console.log("all shelf items are ...", JSON.stringify(shelf, null, 2));
   }
 
-  async function deleteProduct(selProdObj) {
-    const SelectedProductID = +selProdObj.id;
-    const SelectedProductTable = selProdObj.type;
+  // useEffect(() => {
+  //   setCartID(setOrGetCartCookie());
+  //   getTitles();
 
-    const { error } = await supabase
-      .from(SelectedProductTable)
-      .delete()
-      .eq("id", SelectedProductID);
+  //   getCartFromDB(setOrGetCartCookie());
 
-    error && console.log(JSON.stringify(error, null, 2));
-    !error &&
-      alert(
-        `Product from ${SelectedProductTable} with ID ${SelectedProductID} DELETED`
-      );
-
-    router.reload();
-  }
-
-  function changeProduct() {
-    const SelectedProductObject = JSON.parse(
-      document.getElementById("productSelect").value
-    );
-
-    console.log("selected object ... ", SelectedProductObject);
-    setSelectedProduct(SelectedProductObject);
-  }
+  //   console.log(JSON.stringify(cart, null, 2));
+  //   updateTotal();
+  // }, [cart]);
 
   useEffect(() => {
+    setCartID(setOrGetCartCookie());
     getTitles();
+
+    getCartFromDB(setOrGetCartCookie());
+
     console.log(JSON.stringify(cart, null, 2));
-  }, [cart]);
+    updateTotal();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -201,7 +282,9 @@ function ProductsShelf() {
       </ul>
 
       <div className={styles.container}>
-        <pre> {JSON.stringify(shelf, null, 2)}</pre>
+        <pre> {JSON.stringify(cart, null, 2)}</pre>
+        <div>total price {total} </div>
+        <div>cart ID: {cartID} </div>
       </div>
 
       {/* {selectedProduct && (

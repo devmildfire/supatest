@@ -2,8 +2,9 @@ import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { hasCookie, setCookie, getCookie } from "cookies-next";
-import { v4 as uuidv4 } from "uuid";
+// import { hasCookie, setCookie, getCookie } from "cookies-next";
+// import { v4 as uuidv4 } from "uuid";
+import { setOrGetCartCookie } from "@/utils/cartID";
 import Nav from "@/components/nav";
 
 function Login() {
@@ -99,25 +100,6 @@ function SessionInfo({ session }) {
   // console.log("session is...", session);
   const [cartID, setCartID] = useState("");
 
-  function checkCookies() {
-    const cookie = hasCookie("myNewCoockie", { path: "/" })
-      ? getCookie("myNewCoockie", { path: "/" })
-      : "";
-    cookie && setCartID(cookie);
-
-    return cookie ? true : false;
-  }
-
-  function setNewCookie() {
-    const cookieString = uuidv4();
-    setCookie("myNewCoockie", cookieString, {
-      path: "/",
-      sameSite: "none",
-      secure: true,
-    });
-    setCartID(cookieString);
-  }
-
   const router = useRouter();
 
   async function handleSubmit(event) {
@@ -131,7 +113,7 @@ function SessionInfo({ session }) {
   }
 
   useEffect(() => {
-    !checkCookies() && setNewCookie();
+    setCartID(setOrGetCartCookie());
   }, []);
 
   return (
