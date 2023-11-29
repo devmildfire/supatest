@@ -130,8 +130,6 @@ function CheckOut({ cart, cartID, total }) {
   }
 
   function handleCheckout() {
-    // const orderID = createOrder();
-    // console.log(`order id from handle checkout is ...`, orderID);
     createOrderItemsList();
   }
 
