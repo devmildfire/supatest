@@ -50,6 +50,119 @@ function ShelfItem({ updateCart, cart, name, type, price }) {
   );
 }
 
+function CheckOut({ cart, cartID, total }) {
+  const [email, setEmail] = useState("");
+  const [adress, setAdress] = useState("");
+
+  // const cartID = "456";
+  // const total = 999;
+
+  console.log(`cart from CheckOut ... `, JSON.stringify(cart, null, 2));
+
+  console.log(`cartID from CheckOut ... `, cartID);
+
+  async function createOrder() {
+    const { data, error } = await supabase
+      .from("Orders")
+      .insert({
+        status: "pending",
+        cart_id: cartID,
+        email: email,
+        adress: adress,
+        summ: total,
+      })
+      .select()
+      .single();
+
+    let orderID;
+
+    data &&
+      (console.log("New order created ... ", JSON.stringify(data, null, 2)),
+      (orderID = data.id),
+      console.log("Order ID ... ", orderID));
+
+    error &&
+      console.log(
+        "New order FAILED to create ... ",
+        JSON.stringify(error, null, 2)
+      );
+
+    return orderID;
+  }
+
+  async function createOrderItemsList() {
+    const orderID = await createOrder();
+
+    let itemsList = [];
+
+    orderID &&
+      (itemsList = cart?.map((item) => {
+        return {
+          order_id: orderID,
+          name: item.name,
+          type: item.type,
+          quantity: item.number,
+          price: item.price,
+          summ: item.price * item.number,
+        };
+      }));
+
+    const { data, error } = await supabase
+      .from("OrderItems")
+      .insert(itemsList)
+      .select();
+
+    data &&
+      console.log(
+        `New Items List created for order ${orderID} ... `,
+        JSON.stringify(data, null, 2)
+      );
+    error &&
+      console.log(
+        `New Items List FAILED created for order ${orderID} ... `,
+        JSON.stringify(error, null, 2)
+      );
+  }
+
+  function handleCheckout() {
+    // const orderID = createOrder();
+    // console.log(`order id from handle checkout is ...`, orderID);
+    createOrderItemsList();
+  }
+
+  return (
+    <div>
+      <label htmlFor="email"> email </label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        onChange={(e) => {
+          setEmail(e.target.value);
+        }}
+      />
+
+      <label htmlFor="adress"> adress </label>
+      <input
+        type="text"
+        id="adress"
+        name="adress"
+        onChange={(e) => {
+          setAdress(e.target.value);
+        }}
+      />
+
+      <button
+        className={styles.button}
+        onClick={handleCheckout}
+        disabled={!email || cart.length < 1}
+      >
+        CheckOut
+      </button>
+    </div>
+  );
+}
+
 function ProductsShelf() {
   const [shelf, setShelf] = useState([]);
   const [cart, setCart] = useState([]);
@@ -276,6 +389,7 @@ function ProductsShelf() {
         <pre> {JSON.stringify(cart, null, 2)}</pre>
         <div>total price {total} </div>
         <div>cart ID: {cartID} </div>
+        <CheckOut cart={cart} cartID={cartID} total={total} />
       </div>
     </div>
   );
