@@ -54,9 +54,6 @@ function CheckOut({ cart, cartID, total }) {
   const [email, setEmail] = useState("");
   const [adress, setAdress] = useState("");
 
-  // const cartID = "456";
-  // const total = 999;
-
   console.log(`cart from CheckOut ... `, JSON.stringify(cart, null, 2));
 
   console.log(`cartID from CheckOut ... `, cartID);
@@ -131,12 +128,13 @@ function CheckOut({ cart, cartID, total }) {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <label htmlFor="email"> email </label>
       <input
         type="email"
         id="email"
         name="email"
+        defaultValue="example@example.com"
         onChange={(e) => {
           setEmail(e.target.value);
         }}
@@ -147,6 +145,7 @@ function CheckOut({ cart, cartID, total }) {
         type="text"
         id="adress"
         name="adress"
+        defaultValue="A galaxy far far away"
         onChange={(e) => {
           setAdress(e.target.value);
         }}
