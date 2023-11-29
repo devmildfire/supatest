@@ -51,8 +51,8 @@ function ShelfItem({ updateCart, cart, name, type, price }) {
 }
 
 function CheckOut({ cart, cartID, total }) {
-  const [email, setEmail] = useState("");
-  const [adress, setAdress] = useState("");
+  const [email, setEmail] = useState("example@example.com");
+  const [adress, setAdress] = useState("a galaxy far far away");
 
   console.log(`cart from CheckOut ... `, JSON.stringify(cart, null, 2));
 
@@ -142,7 +142,7 @@ function CheckOut({ cart, cartID, total }) {
         type="email"
         id="email"
         name="email"
-        defaultValue="example@example.com"
+        value={email}
         onChange={(e) => {
           setEmail(e.target.value);
         }}
@@ -153,7 +153,7 @@ function CheckOut({ cart, cartID, total }) {
         type="text"
         id="adress"
         name="adress"
-        defaultValue="A galaxy far far away"
+        value={adress}
         onChange={(e) => {
           setAdress(e.target.value);
         }}
