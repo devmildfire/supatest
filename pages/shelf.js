@@ -87,6 +87,12 @@ function CheckOut({ cart, cartID, total }) {
     return orderID;
   }
 
+  async function emptyCart(cartID) {
+    const { error } = await supabase.from("Cart").delete().eq("id", cartID);
+
+    !error && console.log(`cartID emptied ... `, cartID);
+  }
+
   async function createOrderItemsList() {
     const orderID = await createOrder();
 
@@ -110,10 +116,12 @@ function CheckOut({ cart, cartID, total }) {
       .select();
 
     data &&
-      console.log(
+      (console.log(
         `New Items List created for order ${orderID} ... `,
         JSON.stringify(data, null, 2)
-      );
+      ),
+      emptyCart(cartID));
+
     error &&
       console.log(
         `New Items List FAILED created for order ${orderID} ... `,
