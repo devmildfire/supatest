@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { setOrGetCartCookie } from "@/utils/cartID";
 
 import Nav from "@/components/nav";
+import Robokaska from "@/utils/robokaska";
 
 function ShelfItem({ updateCart, cart, name, type, price }) {
   const [number, setNumber] = useState(0);
@@ -50,9 +51,31 @@ function ShelfItem({ updateCart, cart, name, type, price }) {
   );
 }
 
+function generateRoboURL(invoiceID, email, outSum, invoiceDescription) {
+  const config = {
+    shopIdentifier: process.env.NEXT_PUBLIC_SHOP_ID,
+    password1: process.env.NEXT_PUBLIC_ROBOPASS_ONE,
+    password2: process.env.NEXT_PUBLIC_ROBOPASS_TWO,
+    testMode: true, // Указываем true, если работаем в тестовом режиме
+  };
+
+  const roboKassa = new Robokaska(config);
+
+  // Вернёт строку с URL адресом, на который можно отправить пользователя
+  const payURL = roboKassa.generateUrl(
+    invoiceID,
+    email,
+    outSum,
+    invoiceDescription
+  );
+
+  return payURL;
+}
+
 function CheckOut({ cart, cartID, total }) {
   const [email, setEmail] = useState("example@example.com");
   const [adress, setAdress] = useState("a galaxy far far away");
+  const [payURL, setPayURL] = useState("");
 
   console.log(`cart from CheckOut ... `, JSON.stringify(cart, null, 2));
 
@@ -127,11 +150,32 @@ function CheckOut({ cart, cartID, total }) {
         `New Items List FAILED created for order ${orderID} ... `,
         JSON.stringify(error, null, 2)
       );
+
+    // const URL = generateRoboURL(orderID, email, total, "invoiceDescription");
+    const URL = generateRoboURL(
+      orderID,
+      email,
+      1,
+      "Тут какое-то описание всего накупленного"
+    );
+
+    setPayURL(URL);
   }
 
   function handleCheckout() {
     createOrderItemsList();
   }
+
+  useEffect(() => {
+    if (payURL !== "") {
+      console.log(`redirecting to ...`, payURL);
+      // window.location.href = payURL;
+
+      window.open(payURL, "_blank");
+    } else {
+      console.log(`ZERO redirect ...`, payURL);
+    }
+  }, [payURL]);
 
   return (
     <div className={styles.container}>
@@ -164,6 +208,9 @@ function CheckOut({ cart, cartID, total }) {
       >
         CheckOut
       </button>
+
+      <div> PayURL </div>
+      <div> {payURL} </div>
     </div>
   );
 }
