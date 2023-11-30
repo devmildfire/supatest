@@ -480,7 +480,7 @@ export default function ProductsShelfPage() {
           <ProductsShelf />
         </div>
       ) : (
-        <div> No User Session </div>
+        <div> No Current USER Session </div>
       )}
       <Nav />
     </div>
