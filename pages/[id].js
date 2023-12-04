@@ -1,6 +1,5 @@
 import supabase from "@/utils/supabase";
 import styles from "../styles/Home.module.css";
-// import Link from "next/link";
 import { useState, useEffect } from "react";
 import Nav from "@/components/nav";
 
