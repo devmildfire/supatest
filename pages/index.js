@@ -1,6 +1,6 @@
 import styles from "../styles/Home.module.css";
 import supabase from "../utils/supabase";
-import Link from "next/link";
+// import Link from "next/link";
 import Nav from "@/components/nav";
 
 export async function getStaticProps() {
