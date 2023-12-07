@@ -72,6 +72,55 @@ function generateRoboURL(invoiceID, email, outSum, invoiceDescription) {
   return payURL;
 }
 
+function PromoCode() {
+  const [code, setCode] = useState({});
+
+  async function getPromo(code) {
+    const { data, error } = await supabase
+      .from("Promocodes")
+      .select()
+      .eq("code", code)
+      .single();
+
+    data && console.log(`got promocode!`, data);
+    data && setCode(data);
+    error && console.log(`error getting promocode!`, error);
+
+    // return data;
+  }
+
+  function promoCodeSubmit(event) {
+    event.preventDefault();
+    const code = document.getElementById("promocode").value;
+
+    code && alert(`You used the code ${code}`);
+    !code && alert(`Invalid code ${code}`);
+
+    getPromo(code);
+
+    // const codeData = getPromo(code);
+    // codeData && alert(`code is ${JSON.stringify(codeData, null, 2)}`);
+
+    // codeData && setCode(codeData);
+  }
+
+  return (
+    <form onSubmit={promoCodeSubmit} className={styles.container}>
+      <label htmlFor="promocode"> promocode sfdsadfasdfasf</label>
+      <pre> {JSON.stringify(code, null, 2)} </pre>
+      <input
+        type="text"
+        id="promocode"
+        name="promocode"
+        placeholder="Your Promo Code"
+      />
+      <button type="submit" className={styles.button}>
+        submit promo code
+      </button>
+    </form>
+  );
+}
+
 function CheckOut({ cart, cartID, total }) {
   const [email, setEmail] = useState("example@example.com");
   const [adress, setAdress] = useState("a galaxy far far away");
@@ -441,6 +490,7 @@ function ProductsShelf() {
         <pre> {JSON.stringify(cart, null, 2)}</pre>
         <div>total price {total} </div>
         <div>cart ID: {cartID} </div>
+        <PromoCode />
         <CheckOut cart={cart} cartID={cartID} total={total} />
       </div>
     </div>
