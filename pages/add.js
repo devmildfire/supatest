@@ -247,7 +247,7 @@ function Product() {
     console.log(eBookFile);
 
     const { data, error } = await supabase.storage
-      .from("eBooks")
+      .from("ebooks")
       .upload(`/file_${eBookFile.name}`, eBookFile, {
         cacheControl: "3600",
         upsert: true,
@@ -262,7 +262,7 @@ function Product() {
     data.path && console.log(`${data.path} returned`);
 
     const publicUrl = supabase.storage
-      .from("eBooks")
+      .from("ebooks")
       .getPublicUrl(`${data.path}`).data.publicUrl;
 
     console.log(`${publicUrl} returned`);
