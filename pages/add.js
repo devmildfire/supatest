@@ -3,6 +3,7 @@ import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
 // import Link from "next/link";
 import Nav from "@/components/nav";
+import slugify from "slugify";
 
 function Photos({ setupGallery }) {
   const [photos, setPhotos] = useState([]);
@@ -576,6 +577,8 @@ function Product() {
         .from("Titles")
         .insert({
           name: name,
+          slug: slugify(name,
+            { replacement: '-', remove: undefined, locale: 'ru' }),
           description: description,
           thesis: thesis,
           trailer: VideoFileURL,
