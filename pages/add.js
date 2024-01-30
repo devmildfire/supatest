@@ -580,7 +580,8 @@ function Product() {
           thesis: thesis,
           trailer: VideoFileURL,
           age_restriction: ageRestriction,
-          is_featured: isFeatured
+          is_featured: isFeatured,
+          cover: fileURL
         })
         .select("*");
 

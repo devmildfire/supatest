@@ -103,6 +103,7 @@ function Update() {
         thesis: thesis,
         trailer: trailer,
         age_restriction: ageRestriction,
+        cover: fileURL
       })
       .eq("id", title_id)
       .select()
@@ -576,7 +577,7 @@ function Update() {
 
     data &&
       (setProducts(data),
-      console.log("all products data", JSON.stringify(data, null, 2)));
+        console.log("all products data", JSON.stringify(data, null, 2)));
     error && console.error(JSON.stringify(error, null, 2));
   }
 
