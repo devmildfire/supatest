@@ -566,7 +566,11 @@ function Product() {
     const description = event.target.description.value;
     const thesis = event.target.thesis.value;
     const ageRestriction = event.target.ageRestriction.value;
-    const isFeatured = event.target.isFeatured.value;
+    const isFeatured = event.target.isFeatured.value ? true : false;
+    // const isFeatured = target.isFeatured.value;
+
+    // const isFeatured = false;
+
 
     let title_id = await getTitleID(name);
 
@@ -579,6 +583,7 @@ function Product() {
           name: name,
           slug: slugify(name,
             { replacement: '-', remove: undefined, locale: 'ru' }),
+          // slug: 'doctorsax',
           description: description,
           thesis: thesis,
           trailer: VideoFileURL,
@@ -813,7 +818,7 @@ function Product() {
           type="checkbox"
           id="isFeatured"
           name="isFeatured"
-          defaultChecked=""
+          defaultChecked="checked"
         />
 
         <label htmlFor="publishDate"> Publish Date </label>
