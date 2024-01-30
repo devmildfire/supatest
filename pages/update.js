@@ -680,6 +680,23 @@ function Update() {
     data?.length == 0 && setPhotos([]);
   }
 
+  async function getCover(title_ID) {
+    // const titleName = document.getElementById("name").value;
+
+    const { data, error } = await supabase
+      .from("Titles")
+      .select("cover")
+      .eq("title_id", title_ID);
+
+    data?.length > 0
+      ? console.log("allready set cover ... ", data)
+      : console.log("No cover for this Title yet");
+
+    // const currentCover = data?.map((photo) => {
+    //   return photo.source;});
+
+  }
+
   async function handlePhotoUpload(event) {
     event.preventDefault();
 
@@ -1461,6 +1478,7 @@ function Update() {
   useEffect(() => {
     getProducts();
     getAuthorsList();
+    getCover();
   }, []);
 
   return (
