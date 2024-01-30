@@ -110,6 +110,7 @@ function Update() {
       .single();
 
     data && (title_id = await data.id);
+    data && console.log("cover file is ...", fileURL);
     error && console.error("error is ...", error);
 
     if (selectedType == "PrintedBooks") {
@@ -483,7 +484,7 @@ function Update() {
       ...selectedProduct.PrintedBooks,
       cover: [newCoverObj],
     };
-    setSelectedProduct({ ...selectedProduct, PrintedBooks: printedBooksObj });
+    setSelectedProduct({ ...selectedProduct, PrintedBooks: printedBooksObj, cover: publicUrl });
   }
 
   async function handleEBookUpload(event) {
@@ -680,20 +681,19 @@ function Update() {
     data?.length == 0 && setPhotos([]);
   }
 
-  async function getCover(title_ID) {
+  async function getCover(title_id) {
     // const titleName = document.getElementById("name").value;
 
     const { data, error } = await supabase
       .from("Titles")
       .select("cover")
-      .eq("title_id", title_ID);
+      .eq("id", title_id);
 
     data?.length > 0
       ? console.log("allready set cover ... ", data)
       : console.log("No cover for this Title yet");
 
-    // const currentCover = data?.map((photo) => {
-    //   return photo.source;});
+    data && console.log("allready set cover value ... ", data[0].cover)
 
   }
 
@@ -794,6 +794,7 @@ function Update() {
 
     getProductByTableAndID(titleID, table, id);
     getPhotos(titleID);
+    getCover(titleID);
   }
 
   function changePrintBookIsPublished(event) {
@@ -902,6 +903,8 @@ function Update() {
       ...selectedProduct,
       PrintedBooks: printedBookObj,
     });
+
+
   }
 
   function changePrintBookPaper(event) {
@@ -1478,7 +1481,7 @@ function Update() {
   useEffect(() => {
     getProducts();
     getAuthorsList();
-    getCover();
+
   }, []);
 
   return (
@@ -1802,11 +1805,19 @@ function Update() {
               <label htmlFor="cover"> Cover </label>
               {selectedProduct && (
                 <img
-                  src={selectedProduct.PrintedBooks.cover[0].source}
-                  alt={selectedProduct.PrintedBooks.cover[0].source}
+
+                  src={selectedProduct.cover}
+                  alt={selectedProduct.cover}
+
+
+                // src={selectedProduct.PrintedBooks.cover[0].source}
+                // alt={selectedProduct.PrintedBooks.cover[0].source}
+
                 />
               )}
+              {selectedProduct && selectedProduct.cover}
               {selectedProduct && selectedProduct.PrintedBooks.cover[0].source}
+
               <input
                 type="file"
                 id="cover"
