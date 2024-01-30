@@ -323,7 +323,7 @@ function Product() {
         extra: extra,
         lit_form: litForm,
         is_published: isPublished,
-        is_featured: isFeatured,
+        // is_featured: isFeatured,
         price: price,
         discount: discount,
         sold: sold,
@@ -400,7 +400,7 @@ function Product() {
         characters: characters,
         extra: extra,
         is_published: isPublished,
-        is_featured: isFeatured,
+        // is_featured: isFeatured,
         price: price,
         discount: discount,
         sold: sold,
@@ -437,7 +437,7 @@ function Product() {
         title_id: titleID,
         extra: extra,
         is_published: isPublished,
-        is_featured: isFeatured,
+        // is_featured: isFeatured,
         price: price,
         discount: discount,
         sold: sold,
@@ -565,6 +565,7 @@ function Product() {
     const description = event.target.description.value;
     const thesis = event.target.thesis.value;
     const ageRestriction = event.target.ageRestriction.value;
+    const isFeatured = event.target.isFeatured.value;
 
     let title_id = await getTitleID(name);
 
@@ -579,6 +580,7 @@ function Product() {
           thesis: thesis,
           trailer: VideoFileURL,
           age_restriction: ageRestriction,
+          is_featured: isFeatured
         })
         .select("*");
 
@@ -800,6 +802,14 @@ function Product() {
           id="isPublished"
           name="isPublished"
           defaultChecked="checked"
+        />
+
+        <label htmlFor="isFeatured"> Is Featured </label>
+        <input
+          type="checkbox"
+          id="isFeatured"
+          name="isFeatured"
+          defaultChecked=""
         />
 
         <label htmlFor="publishDate"> Publish Date </label>
